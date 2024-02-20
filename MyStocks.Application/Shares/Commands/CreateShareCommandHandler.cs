@@ -31,7 +31,7 @@ namespace MyStocks.Application.Shares.Commands
 
         public async Task<Result<Guid>> Handle(CreateShareCommand request, CancellationToken cancellationToken)
         {
-            var validationResult =  await _validator.ValidateAsync(request);
+            var validationResult =  _validator.Validate(request);
 
             if (!validationResult.IsValid) 
             {
@@ -56,8 +56,6 @@ namespace MyStocks.Application.Shares.Commands
                     "and there is not defalt currencyType set");
 
             var shareTypeEnum = Enum.Parse<ShareTypes>(request.shareTypeCode);
-
-            throw new NotImplementedException();
 
             var share = Share.Create(request.code, request.name, request.description, shareTypeEnum, currencyType);
 

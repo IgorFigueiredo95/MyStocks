@@ -64,11 +64,15 @@ public class GetShareDetailListByCodeQueryDTO
         OperationTypeCode = operationTypeCode;
     }
     [JsonPropertyName("id")]
+     [JsonPropertyOrder(-2)]
     public Guid? ShareDetailId { get; set; }
+
+    [JsonPropertyOrder(-1)]
+    public string? OperationTypeCode { get; init; }
     public string? Note { get; init; }
     public decimal? Quantity { get; init; }
     public decimal? Price { get; init; }
     public string? CurrencyCode { get; set; }
-    public string? OperationTypeCode { get; init; }
+    
 
 }

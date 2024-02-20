@@ -37,6 +37,7 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.Property(x => x.CreatedAt).HasConversion(
                 srcdate => DateTime.SpecifyKind(srcdate, DateTimeKind.Utc),
                 destDate => DateTime.SpecifyKind(destDate, DateTimeKind.Utc));
+
             builder.Property(x => x.UpdatedAt).HasConversion(
                 srcdate => DateTime.SpecifyKind(srcdate, DateTimeKind.Utc),
                 destDate => DateTime.SpecifyKind(destDate, DateTimeKind.Utc));

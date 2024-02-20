@@ -105,7 +105,7 @@ namespace MyStocks.Api.Controllers
 
         [HttpPost]
         [Route("SharesDetail")]
-        public async Task<IActionResult> AddShareDetail(CreateShareDetailRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddShareDetail([FromBody] CreateShareDetailRequest request, CancellationToken cancellationToken)
         {
             var command = new CreateShareDetailCommand(
                 request.ShareCode,
@@ -114,27 +114,21 @@ namespace MyStocks.Api.Controllers
                 request.Price,
                 request.OperationTypeCode);
 
-            Guid result;
-            try
-            {
-                result = await _mediator.Send(command);
-            }
-            catch (Exception ex)
-            {
-                //todo: Estruturar a saída de erros e responses corretamente de todos endpoints
-                return BadRequest(new ProblemDetails()
-                {
-                    Title = "One or more errors has ocourred.",
-                    Detail = $"A validation error error has ocourred. verify you request. {ex.Message}"
-                }); ;
-            }
+          
+                var result = await _mediator.Send(command);
+            
+            if(result.IsFailure)
+               return  Responses.Error(HttpContext, result.Errors.ToList());
 
-            return Ok(result);
+            return Ok(result.Value);
         }
 
         [HttpGet]
         [Route("shareDetail/{shareCode}")]
-        public async Task<IActionResult> GetShareDetaiListPagination([FromRoute] string shareCode, [FromQuery] int offSet, [FromQuery] int limit) 
+        public async Task<IActionResult> GetShareDetaiListPagination(
+            [FromRoute] string shareCode,
+            [FromQuery] int offSet,
+            [FromQuery] int limit) 
         {
             var query = new GetShareDetailListByCodeQuery(shareCode, offSet, limit);
             var result = await _mediator.Send(query);

@@ -100,20 +100,25 @@ namespace MyStocks.Domain.Shares
             TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
                 TotalValueInvested.Value - shareDetail.Price.Value * shareDetail.Quantity);
 
-            TotalShares += shareDetail.Quantity;
+            TotalShares -= shareDetail.Quantity;
         }
 
         private void CalculateAveragePrice(ShareDetail shareDetail)
         {
             if (shareDetail.OperandType == OperationType.Buy)
             {
-                AveragePrice = Currency.Create(AveragePrice.CurrencyType,(TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
-                                                (TotalShares + shareDetail.Quantity));
+                decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
+                                                (TotalShares + shareDetail.Quantity);
+
+                AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
             }
-            else
+
+            if (shareDetail.OperandType == OperationType.Sell)
             {
-                AveragePrice = Currency.Create(AveragePrice.CurrencyType, (TotalShares  * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
-                                                (TotalShares - shareDetail.Quantity));
+                decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
+                                                 (TotalShares - shareDetail.Quantity);
+
+                AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
             }
 
 

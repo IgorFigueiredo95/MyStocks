@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Shares;
@@ -15,4 +16,4 @@ public record CreateShareDetailCommand(
     string? Note,
     decimal Quantity,
     decimal Price,
-    string OperationTypeCode):IRequest<Guid>;
+    string OperationTypeCode):IRequest<Result<Guid>>;
