@@ -38,63 +38,6 @@ public class Result<T>
         _Errors.AddRange(errors);
     }
 
-    //private Result(bool isSuccess, List<Error> errors, T? result)
-    //{
-    //    if (isSuccess && result is null)
-    //        throw new InvalidOperationException("You cannot return success result without a result value.");
-
-    //    if (!isSuccess && result is not null)
-    //        throw new InvalidOperationException("You cannot return error with a result value.");
-
-    //    IsSuccess = isSuccess;
-
-    //    if (errors.Count > 0)
-    //        _Errors.AddRange(errors);
-
-    //    if (result != null)
-    //        Value = result;
-    //}
-    //private  Result(bool isSuccess, Error errors, T? result)
-    //{
-    //    if (isSuccess && result is null)
-    //        throw new InvalidOperationException("You cannot return success result without a result value.");
-
-    //    if (!isSuccess && result is not  null)
-    //        throw new InvalidOperationException("You cannot return error with a result value.");
-
-    //    IsSuccess = isSuccess;
-
-    //    _Errors.Add(errors);
-
-    //    if (result != null)
-    //        Value = result;
-    //}
-
-    #region create Result
-
-    public static Result<T> Create(T value)
-    {
-        return new Result<T>(value);
-    }
-
-    public static Result<T> Create(Error error)
-    {
-        return new Result<T>(error);
-    }
-
-    public static Result<T> Create(List<Error> errors)
-    {
-        return new Result<T>(errors);
-    }
-
-    public static Result<T> Create(string key,string message)
-    {
-        var error = Error.Create(key, message);
-
-        return new Result<T>(error);
-    }
-    #endregion
-
     #region Add Error
     public void AddError(Error error)
     {
