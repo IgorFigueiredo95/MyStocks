@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Domain
 {
-    public static class Constants
+    public static partial class Constants
     {
         public const int MAX_CODE_LENGTH = 10;
         public const int MAX_CURRENCYCODE_LENGTH = 3;
