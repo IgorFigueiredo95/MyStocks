@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using MyStocks.Application.Common;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.Currencies;
@@ -28,11 +29,8 @@ namespace MyStocks.Application.CurrenciesTypes.Queries
             var resultValidation  = _validator.Validate(request);
 
             if (!resultValidation.IsValid)
-            {
-                var error = new List<Error>();
-                resultValidation.Errors.ForEach(errorResult => error.Add(Error.Create("input_validation_error", errorResult.ErrorMessage)));
-            }
-            
+                return resultValidation.ReturnListErrors();
+
             var CurrencyType = await _currencyTypesRepository.GetByIdAsync(request.Id);
 
             if (CurrencyType is null)

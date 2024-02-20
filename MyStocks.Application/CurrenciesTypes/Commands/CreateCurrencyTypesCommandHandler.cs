@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using MyStocks.Application.Common;
 using MyStocks.Application.Currencies;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
@@ -36,11 +37,8 @@ public class CreateCurrencyTypesCommandHandler: IRequestHandler<CreateCurrencyTy
         var  resultValidation =  await _validator.ValidateAsync(request, cancellationToken);
 
         if (!resultValidation.IsValid)
-        {
-            var errors = new List<Error>();
-            resultValidation.Errors.ForEach(errorResult => errors.Add(Error.Create("INPUT_VALIDATION_ERROR", errorResult.ErrorMessage)));
-            return errors;
-        }
+            return resultValidation.ReturnListErrors();
+
         var IsUnique = await _currencyTypesRepository.CodeIsUniqueAsync(request.Code);
 
         if (!IsUnique)

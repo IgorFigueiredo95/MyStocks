@@ -33,12 +33,8 @@ namespace MyStocks.Application.Shares.Commands
         {
             var validationResult =  _validator.Validate(request);
 
-            if (!validationResult.IsValid) 
-            {
-                var error = new List<Error>();
-                validationResult.Errors.ForEach(ErrorResult => error.Add(Error.Create("INPUT_VALIDATION_ERROR", ErrorResult.ErrorMessage)));
-                return error;
-            }
+            if (!resultValidation.IsValid)
+                return resultValidation.ReturnListErrors();
 
             var exist = await _shareRepository.CodeIsUniqueAsync(request.code);
             if (!exist)
