@@ -15,6 +15,7 @@ public interface IShareDetailRepository
     public void Update(ShareDetail share);
 
     public void Remove(ShareDetail share);
+    public Task<ShareDetail?> GetByIdAsync(Guid id);
 
     public Task<List<ShareDetail>> GetShareDetailByPagination(Guid ShareId, int Limit, int offSet);
 }

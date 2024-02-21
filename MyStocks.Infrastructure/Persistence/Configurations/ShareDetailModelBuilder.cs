@@ -31,7 +31,7 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
 
             builder.OwnsOne(x => x.Price);
 
-            builder.Property(x => x.OperandType)
+            builder.Property(x => x.OperationType)
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt).HasConversion(
