@@ -57,7 +57,7 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
                 share.Quantity, 
                 share.Price.Value,
                 share.Price.CurrencyType.Code,
-                share.OperandType.ToString()
+                share.OperationType.ToString()
                 )));
 
         var result = new GetShareDetailListByCodeQueryDTO(
