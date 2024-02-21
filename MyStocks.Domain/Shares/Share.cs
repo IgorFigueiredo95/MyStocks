@@ -82,38 +82,47 @@ namespace MyStocks.Domain.Shares
         {
             SharesDetails.Add(shareDetail);
 
-            CalculateAveragePrice(shareDetail);
-
-            TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
-                TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)
-                );
-
-            TotalShares += shareDetail.Quantity;
+            CalculateAveragePrice(shareDetail,false);
+            CalculateTotals(shareDetail, false);
         }
 
         public void RemoveShareDetail(ShareDetail shareDetail)
         {
-            SharesDetails.Append(shareDetail);
+            //TODO: O sharedetail e Share estão dependente um do outro fortemente. verificar a
+            //criação de um domain service para controlar o uso dos dois
+            SharesDetails.Remove(shareDetail);
 
-            CalculateAveragePrice(shareDetail);
+            CalculateAveragePrice(shareDetail, true);
+            CalculateTotals(shareDetail, true);
 
-            TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
-                TotalValueInvested.Value - shareDetail.Price.Value * shareDetail.Quantity);
-
-            TotalShares -= shareDetail.Quantity;
         }
 
-        private void CalculateAveragePrice(ShareDetail shareDetail)
+        public void UpdateShareDetail(ShareDetail oldshareDetail, ShareDetail newShareDetail)
         {
-            if (shareDetail.OperandType == OperationType.Buy)
+            if (oldshareDetail.Id != newShareDetail.Id)
+                throw new InvalidOperationException("you cannot update share detail with a new share detail");
+
+            CalculateAveragePrice(oldshareDetail, true);
+            CalculateTotals(oldshareDetail, true);
+
+            CalculateAveragePrice(newShareDetail, false);
+            CalculateTotals(newShareDetail, false);
+
+        }
+
+
+        private void CalculateAveragePrice(ShareDetail shareDetail, bool isRemove)
+        {
+
+            if (shareDetail.OperationType == OperationType.Buy && !isRemove ||
+                shareDetail.OperationType == OperationType.Sell && isRemove)
             {
                 decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
                                                 (TotalShares + shareDetail.Quantity);
 
                 AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
             }
-
-            if (shareDetail.OperandType == OperationType.Sell)
+            else
             {
                 decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
                                                  (TotalShares - shareDetail.Quantity);
@@ -123,6 +132,25 @@ namespace MyStocks.Domain.Shares
 
 
         }
-        
+
+        private void CalculateTotals(ShareDetail shareDetail, bool isRemove)
+        {
+            if (shareDetail.OperationType == OperationType.Buy && !isRemove ||
+                shareDetail.OperationType == OperationType.Sell && isRemove)
+            {
+                TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
+                   TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)
+                   );
+
+                TotalShares += shareDetail.Quantity;
+            }
+            else
+            {
+                TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
+                TotalValueInvested.Value - shareDetail.Price.Value * shareDetail.Quantity);
+
+                TotalShares -= shareDetail.Quantity;
+            }
+        }
     }
 }

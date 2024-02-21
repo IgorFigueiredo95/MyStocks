@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using MyStocks.Application.Common;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
@@ -31,7 +32,7 @@ namespace MyStocks.Application.Shares.Commands
 
         public async Task<Result<Guid>> Handle(CreateShareCommand request, CancellationToken cancellationToken)
         {
-            var validationResult =  _validator.Validate(request);
+            var resultValidation = _validator.Validate(request);
 
             if (!resultValidation.IsValid)
                 return resultValidation.ReturnListErrors();

@@ -68,6 +68,26 @@ namespace MyStocks.Api.Controllers
 
         }
 
+        [HttpPut]
+        [Route("shareDetail/{id}")]
+        public async Task<IActionResult> UpdateShareDetail([FromRoute] Guid id, [FromBody] UpdateShareDetailRequest request, CancellationToken cancellationToken)
+        {
+            var command = new UpdateShareDetailCommand(
+                id,
+                request.Note,
+                request.Quantity,
+                request.Price);
+
+
+              var result = await _mediator.Send(command, cancellationToken);
+
+            if (result.IsFailure)
+               return Responses.Error(HttpContext,result.Errors.ToList());
+
+            return Ok();
+
+        }
+
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetShareById(Guid id, CancellationToken cancellationToken) 
