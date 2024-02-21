@@ -7,13 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace MyStocks.Application.Shares.Commands;
+namespace MyStocks.Contracts.Shares;
 
-public record CreateShareDetailCommand(
-    string ShareCode,
+public record UpdateShareDetailRequest(
     string? Note,
-    decimal Quantity,
-    decimal Price,
-    string OperationTypeCode):IRequest<Result<Guid>>;
+    decimal? Quantity,
+    decimal? Price
+    );

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using MyStocks.Application.Common;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
@@ -30,14 +31,10 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
     }
     public async Task<Result<GetShareDetailListByCodeQueryDTO>> Handle(GetShareDetailListByCodeQuery request, CancellationToken cancellationToken)
     {
-        var validationResult = _validator.Validate(request);
+        var resultValidation = _validator.Validate(request);
 
-        if (!validationResult.IsValid)
-        {
-            List<Error> errors = new();
-            validationResult.Errors.ForEach(errorResult => errors.Add( Error.Create("INPUT_VALIDATION_ERROR", errorResult.ErrorMessage)));
-            return errors;
-        }
+        if (!resultValidation.IsValid)
+            return resultValidation.ReturnListErrors();
 
         var shareHeader = await _shareRepository.GetByCodeAsync(request.Code);
 
@@ -60,7 +57,7 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
                 share.Quantity, 
                 share.Price.Value,
                 share.Price.CurrencyType.Code,
-                share.OperandType.ToString()
+                share.OperationType.ToString()
                 )));
 
         var result = new GetShareDetailListByCodeQueryDTO(

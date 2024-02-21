@@ -22,6 +22,7 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.Property(x => x.Code)
                 .HasMaxLength(Constants.MAX_CODE_LENGTH)
                 .IsRequired();
+
             builder.HasIndex(x => x.Code).IsUnique();
 
             builder.Property(x => x.Name)

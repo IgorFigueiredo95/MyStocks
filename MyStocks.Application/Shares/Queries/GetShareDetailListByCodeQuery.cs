@@ -9,4 +9,8 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Shares.Queries;
 
-public record GetShareDetailListByCodeQuery(string Code, int OffSet, int Limit):IRequest<Result<GetShareDetailListByCodeQueryDTO>>;
+public record GetShareDetailListByCodeQuery(
+    string Code,
+    int OffSet,
+    int Limit):IRequest<Result<GetShareDetailListByCodeQueryDTO>>;
+

@@ -20,26 +20,6 @@ public class Result
         IsSuccess = isSuccess;
     }
 
-    #region Create
-    public static Result Create()
-    {
-        return new Result(true);
-    }
-
-    public static Result Create(Error error)
-    {
-        var result = new Result(false);
-        result.AddError(error);
-        return result;
-    }
-    public static Result Create(List<Error> errors)
-    {
-        var result = new Result(false);
-        result.AddError(errors);
-        return result;
-    }
-    #endregion
-
     public void AddError(Error error)
     {
         IsSuccess = false;

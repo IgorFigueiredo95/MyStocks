@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using MyStocks.Application.Common;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
@@ -31,14 +32,10 @@ namespace MyStocks.Application.Shares.Commands
 
         public async Task<Result<Guid>> Handle(CreateShareCommand request, CancellationToken cancellationToken)
         {
-            var validationResult =  await _validator.ValidateAsync(request);
+            var resultValidation = _validator.Validate(request);
 
-            if (!validationResult.IsValid) 
-            {
-                var error = new List<Error>();
-                validationResult.Errors.ForEach(ErrorResult => error.Add(Error.Create("INPUT_VALIDATION_ERROR", ErrorResult.ErrorMessage)));
-                return error;
-            }
+            if (!resultValidation.IsValid)
+                return resultValidation.ReturnListErrors();
 
             var exist = await _shareRepository.CodeIsUniqueAsync(request.code);
             if (!exist)
@@ -56,8 +53,6 @@ namespace MyStocks.Application.Shares.Commands
                     "and there is not defalt currencyType set");
 
             var shareTypeEnum = Enum.Parse<ShareTypes>(request.shareTypeCode);
-
-            throw new NotImplementedException();
 
             var share = Share.Create(request.code, request.name, request.description, shareTypeEnum, currencyType);
 
