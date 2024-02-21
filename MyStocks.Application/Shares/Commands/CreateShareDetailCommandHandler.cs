@@ -47,11 +47,11 @@ public class CreateShareDetailCommandHandler : IRequestHandler<CreateShareDetail
 
         if (request.OperationTypeCode == OperationType.Buy.ToString())
         {
-            share.AddShareDetail(shareDetail);
+            share.Add(shareDetail);
         }
         else
         {
-            share.RemoveShareDetail(shareDetail);
+            share.Remove(shareDetail);
         }
         
 

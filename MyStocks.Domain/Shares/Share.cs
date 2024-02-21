@@ -78,7 +78,7 @@ namespace MyStocks.Domain.Shares
 
             return this;
         }
-        public void AddShareDetail(ShareDetail shareDetail)
+        public void Add(ShareDetail shareDetail)
         {
             SharesDetails.Add(shareDetail);
 
@@ -86,7 +86,7 @@ namespace MyStocks.Domain.Shares
             CalculateTotals(shareDetail, false);
         }
 
-        public void RemoveShareDetail(ShareDetail shareDetail)
+        public void Remove(ShareDetail shareDetail)
         {
             //TODO: O sharedetail e Share estão dependente um do outro fortemente. verificar a
             //criação de um domain service para controlar o uso dos dois
@@ -97,7 +97,7 @@ namespace MyStocks.Domain.Shares
 
         }
 
-        public void UpdateShareDetail(ShareDetail oldshareDetail, ShareDetail newShareDetail)
+        public void Update(ShareDetail oldshareDetail, ShareDetail newShareDetail)
         {
             if (oldshareDetail.Id != newShareDetail.Id)
                 throw new InvalidOperationException("you cannot update share detail with a new share detail");

@@ -50,7 +50,7 @@ public class UpdateShareDetailCommandHandler : IRequestHandler<UpdateShareDetail
 
         shareDetail.Update(request.Note, request.Quantity, newPrice);
 
-        share.UpdateShareDetail(oldShareDetail, shareDetail);
+        share.Update(oldShareDetail, shareDetail);
 
         _shareDetailRepository.Update(shareDetail);
         _shareRepository.Update(share);
