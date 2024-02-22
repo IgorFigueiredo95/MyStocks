@@ -40,17 +40,24 @@ public class UpdateShareDetailCommandHandler : IRequestHandler<UpdateShareDetail
 
         var share = await _shareRepository.GetByIdAsync(shareDetail!.ShareId);
 
-        Currency newPrice = shareDetail.Price;
-        if (request.Price is not null)
-            newPrice = Currency.Create(shareDetail.Price.CurrencyType, request.Price.Value);
+        var updatedPrice =  
+            (request.Price != null) ? 
+                Currency.Create(shareDetail.Price.CurrencyType, request.Price.Value) 
+                : shareDetail.Price;
 
-        if (shareDetail.OperationType == OperationType.Sell && 
-            request.Price * request.Quantity >= share.TotalValueInvested.Value)
-                return Error.Create("OPERATION_TYPE_IS_INVALID", "You cannot sell more than what you have.");
+        var updatedQuantity = request.Quantity ?? shareDetail.Quantity;
 
-        shareDetail.Update(request.Note, request.Quantity, newPrice);
+        shareDetail.Update(request.Note, updatedQuantity, updatedPrice);
+        
+        try
+        {
+            share.UpdateValues(oldShareDetail, shareDetail);
+        }
+        catch (Exception ex)
+        {
+            return Error.Create("INVALID_OPERATION", ex.Message);
+        }
 
-        share.Update(oldShareDetail, shareDetail);
 
         _shareDetailRepository.Update(shareDetail);
         _shareRepository.Update(share);

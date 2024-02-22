@@ -35,6 +35,10 @@ public class CreateShareDetailCommandHandler : IRequestHandler<CreateShareDetail
         if (share is null)
             return Error.Create("SHARE_NOT_FOUND",$"No share was found with code '{request.ShareCode}'.");
 
+        if (request.OperationTypeCode == OperationType.Sell.ToString() && 
+            !share.HasEnoughBalanceToSell(request.Quantity, request.Price))
+            return Error.Create("INVALID_OPERATION", $" You do not have enough balance to sell this amount.");
+
         //TODO: Alterar o value object para receber somente o código do CurrencyType. está dificil trabalhar com o Currency necessitando de Id a todo moment 
         var currencyType = share.AveragePrice.CurrencyType;
         
@@ -47,11 +51,11 @@ public class CreateShareDetailCommandHandler : IRequestHandler<CreateShareDetail
 
         if (request.OperationTypeCode == OperationType.Buy.ToString())
         {
-            share.Add(shareDetail);
+            share.AddValues(shareDetail);
         }
         else
         {
-            share.Remove(shareDetail);
+            share.RemoveValues(shareDetail);
         }
         
 

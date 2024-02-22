@@ -78,7 +78,7 @@ namespace MyStocks.Domain.Shares
 
             return this;
         }
-        public void Add(ShareDetail shareDetail)
+        public void AddValues(ShareDetail shareDetail)
         {
             SharesDetails.Add(shareDetail);
 
@@ -86,18 +86,18 @@ namespace MyStocks.Domain.Shares
             CalculateTotals(shareDetail, false);
         }
 
-        public void Remove(ShareDetail shareDetail)
+        public void RemoveValues(ShareDetail shareDetail)
         {
             //TODO: O sharedetail e Share estão dependente um do outro fortemente. verificar a
             //criação de um domain service para controlar o uso dos dois
             SharesDetails.Remove(shareDetail);
 
-            CalculateAveragePrice(shareDetail, true);
-            CalculateTotals(shareDetail, true);
+            CalculateAveragePrice(shareDetail, false);
+            CalculateTotals(shareDetail, false);
 
         }
 
-        public void Update(ShareDetail oldshareDetail, ShareDetail newShareDetail)
+        public void UpdateValues(ShareDetail oldshareDetail, ShareDetail newShareDetail)
         {
             if (oldshareDetail.Id != newShareDetail.Id)
                 throw new InvalidOperationException("you cannot update share detail with a new share detail");
@@ -105,17 +105,23 @@ namespace MyStocks.Domain.Shares
             CalculateAveragePrice(oldshareDetail, true);
             CalculateTotals(oldshareDetail, true);
 
+            if (newShareDetail.OperationType == OperationType.Sell &&
+                !HasEnoughBalanceToSell(newShareDetail.Quantity, newShareDetail.Price.Value))
+            {
+                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
+            };
+
             CalculateAveragePrice(newShareDetail, false);
             CalculateTotals(newShareDetail, false);
 
         }
 
 
-        private void CalculateAveragePrice(ShareDetail shareDetail, bool isRemove)
+        private void CalculateAveragePrice(ShareDetail shareDetail, bool isUpdate)
         {
 
-            if (shareDetail.OperationType == OperationType.Buy && !isRemove ||
-                shareDetail.OperationType == OperationType.Sell && isRemove)
+            if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
+                shareDetail.OperationType == OperationType.Sell && isUpdate)
             {
                 decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
                                                 (TotalShares + shareDetail.Quantity);
@@ -133,10 +139,10 @@ namespace MyStocks.Domain.Shares
 
         }
 
-        private void CalculateTotals(ShareDetail shareDetail, bool isRemove)
+        private void CalculateTotals(ShareDetail shareDetail, bool isUpdate)
         {
-            if (shareDetail.OperationType == OperationType.Buy && !isRemove ||
-                shareDetail.OperationType == OperationType.Sell && isRemove)
+            if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
+                shareDetail.OperationType == OperationType.Sell && isUpdate)
             {
                 TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
                    TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)
@@ -152,5 +158,16 @@ namespace MyStocks.Domain.Shares
                 TotalShares -= shareDetail.Quantity;
             }
         }
+
+
+        public bool HasEnoughBalanceToSell(decimal quantityToSell, decimal value)
+        {
+            if (quantityToSell > TotalShares || 
+                (quantityToSell * value) > TotalValueInvested.Value)
+                return false;
+
+            return true;
+        }
+
     }
 }
