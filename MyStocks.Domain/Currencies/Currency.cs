@@ -1,5 +1,7 @@
 ﻿using MyStocks.Domain.Exceptions;
 using MyStocks.Domain.Primitives;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 
 namespace MyStocks.Domain.Currencies
 {
@@ -40,6 +42,11 @@ namespace MyStocks.Domain.Currencies
             return new Currency(currencyType, value);
 
         }
+
+        //public static decimal operator -(Currency one, Currency another)
+        //{
+        //   return one.Value - another.Value;
+        //}
 
         public override string ToString()
         {

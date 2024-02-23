@@ -42,7 +42,7 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
 
             builder.OwnsOne(x => x.AveragePrice);
 
-            builder.HasMany(x => x.SharesDetails).
+            builder.HasMany(x => x.ShareDetails).
                 WithOne();
 
             builder.Property(x => x.CreatedAt)

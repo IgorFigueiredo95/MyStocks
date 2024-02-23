@@ -17,8 +17,7 @@ public static class InfraDInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICurrencyTypesRepository, CurrencyTypesRepository>();
         services.AddScoped<IShareRepository, ShareRepository>();
-        services.AddScoped<IShareDetailRepository, ShareDetailRepository>();
-        services.AddDbContext<ApplicationDbContext>(ServiceLifetime.Singleton);
+        services.AddDbContext<ApplicationDbContext>();
 
         return services;
     }
