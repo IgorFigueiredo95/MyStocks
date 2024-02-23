@@ -105,7 +105,7 @@ namespace MyStocks.Api.Controllers
                     result.TotalValueInvested,
                     result.TotalShares,
                     result.AveragePrice,
-                    result.SharesDetails,
+                    result.ShareDetails.ToList(),
                     result.CreatedAt,
                     result.UpdatedAt);
 
@@ -137,7 +137,7 @@ namespace MyStocks.Api.Controllers
           
                 var result = await _mediator.Send(command);
             
-            if(result.IsFailure)
+                if(result.IsFailure)
                return  Responses.Error(HttpContext, result.Errors.ToList());
 
             return Ok(result.Value);

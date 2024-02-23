@@ -45,12 +45,11 @@ public class ShareDetail : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static ShareDetail Create(Guid shareId, decimal quantity, Currency price, string operationTypeCode, string? note)
+    internal void SetParentShareId(Guid id) => ShareId = id;
+
+    public static ShareDetail Create(decimal quantity, Currency price, string operationTypeCode, string? note)
 
     {
-        if (shareId == Guid.Empty)
-            throw new InvalidLengthShareDetailCodeException(nameof(shareId),new NullReferenceException());
-
         if (quantity <= 0)
             throw new InvalidQuantityShareDetailException(nameof(quantity));
 
@@ -62,16 +61,12 @@ public class ShareDetail : Entity
             throw new InvalidOperationTypeShareDetailException(nameof(operationTypeCode));
 
 
-        return new ShareDetail(Guid.NewGuid(), shareId, quantity, price, parsedOperationType, note);
+        return new ShareDetail(Guid.NewGuid(), Guid.Empty, quantity, price, parsedOperationType, note);
 
 
     }
 
-    public  ShareDetail Update(
-    string? note,
-    decimal? quantity,
-    Currency? price
-    )
+    internal ShareDetail Update(string? note,decimal? quantity, Currency? price)
     {
 
         if (quantity <= 0)
@@ -87,17 +82,5 @@ public class ShareDetail : Entity
         UpdatedAt = DateTime.UtcNow;
 
         return this;
-    }
-
-
-    public ShareDetail DeepCopy()
-    {
-        return new ShareDetail(
-                Id,
-                ShareId,
-                Quantity,
-                Price,
-                OperationType,
-                Note);
     }
 }

@@ -17,16 +17,13 @@ namespace MyStocks.Application.Shares.Queries;
 public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDetailListByCodeQuery, Result<GetShareDetailListByCodeQueryDTO>>
 {
     private readonly IShareRepository _shareRepository;
-    private readonly IShareDetailRepository _shareDetailRepository;
     private readonly IValidator<GetShareDetailListByCodeQuery> _validator;
 
     public GetShareDetailListByCodeQueryHandler(
         IShareRepository shareRepository,
-        IShareDetailRepository shareDetailRepository,
         IValidator<GetShareDetailListByCodeQuery> validator)
     {
         _shareRepository = shareRepository;
-        _shareDetailRepository = shareDetailRepository;
         _validator = validator;
     }
     public async Task<Result<GetShareDetailListByCodeQueryDTO>> Handle(GetShareDetailListByCodeQuery request, CancellationToken cancellationToken)
@@ -41,7 +38,7 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
         if (shareHeader is null)
             return Error.Create("SHARE_NOT_FOUND", $"Share with code '{request.Code}' was not found.");
 
-        var shareList = await _shareDetailRepository.GetShareDetailByPagination(
+        var shareList = await _shareRepository.GetShareDetailByPagination(
                                                     shareHeader.Id,
                                                     request.Limit,
                                                     request.OffSet);
@@ -53,8 +50,8 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
             .ForEach(share => shareListDto
             .Add(new GetShareDetailListDTO(
                 share.Id,
-                share.Note, 
-                share.Quantity, 
+                share.Note,
+                share.Quantity,
                 share.Price.Value,
                 share.Price.CurrencyType.Code,
                 share.OperationType.ToString()
@@ -70,7 +67,7 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
             shareHeader.TotalShares,
             shareHeader.AveragePrice.Value,
             shareListDto);
-        
+
         return result;
 
 

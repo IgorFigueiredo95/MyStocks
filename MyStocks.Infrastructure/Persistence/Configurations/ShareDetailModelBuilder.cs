@@ -6,6 +6,7 @@ using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Shares;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,13 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<ShareDetail> builder)
         {
+            //Como geramos manualmente o Id guid, o contexto seta o state da entidade como "modified"
+            //quando deveria ser "added" ao salvar no banco ocontexto espera achar essa entidade no banco e não acha, dando erro.
+            //Com  "ValueGeneratedNever()", deixamos claro que o banco não gera esse Id.
+
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id)
+                .ValueGeneratedNever();
 
             builder.HasOne(x => x.Share)
                 .WithMany()

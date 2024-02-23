@@ -1,21 +1,30 @@
-﻿using MyStocks.Domain.Currencies;
+﻿using MyStocks.Domain.Common.Primitives;
+using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Exceptions;
 using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Shares.Exceptions;
 using MyStocks.Domain.Shares.Exceptions.Shares;
+using MyStocks.Domain.Shares.Exceptions.SharesDetail;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MyStocks.Domain.Shares
 {
-    public class Share:Entity
+    //Aggregate Root => raiz da agregação share.
+    //garante a consistência do aggregate
+    //Agregates filhos "ShareDetail" são controlados/persistidos por aqui. para garantir a consistência.
+    //https://martinfowler.com/bliki/DDD_Aggregate.html
+    //https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
+    public class Share : Entity, IAggregateRoot
     {
         public string Code { get; private set; }
         public string Name { get; private set; }
@@ -24,7 +33,9 @@ namespace MyStocks.Domain.Shares
         public Currency TotalValueInvested { get; private set; }
         public decimal TotalShares { get; private set; }
         public Currency AveragePrice { get; private set; }
-        public List<ShareDetail> SharesDetails { get; private set; } = new List<ShareDetail>();
+
+        private List<ShareDetail> _shareDetails = new List<ShareDetail>();
+        public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
         
@@ -78,44 +89,52 @@ namespace MyStocks.Domain.Shares
 
             return this;
         }
-        public void AddValues(ShareDetail shareDetail)
+
+        public void AddShareDetail(ShareDetail shareDetail)
         {
-            SharesDetails.Add(shareDetail);
+            shareDetail.SetParentShareId(Id);
+
+            if (shareDetail.OperationType == OperationType.Sell &&
+            !HasEnoughBalanceToSell(shareDetail.Quantity, shareDetail.Price.Value))
+                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
 
             CalculateAveragePrice(shareDetail,false);
             CalculateTotals(shareDetail, false);
+
+            _shareDetails.Add(shareDetail);
         }
 
-        public void RemoveValues(ShareDetail shareDetail)
+        public void UpdateShareDetail(ShareDetail oldshareDetail, string? note, decimal? quantity, Currency? price)
         {
-            //TODO: O sharedetail e Share estão dependente um do outro fortemente. verificar a
-            //criação de um domain service para controlar o uso dos dois
-            SharesDetails.Remove(shareDetail);
+
+            if (oldshareDetail.ShareId != Id || oldshareDetail.ShareId == Guid.Empty)
+                throw new InvalidOperationException("This Share Detail does not belong to this Share!");
+
+            CalculateAveragePrice(oldshareDetail, true);
+            CalculateTotals(oldshareDetail, true);
+
+            var updatedShareDetail = oldshareDetail.Update(note, quantity, price);
+
+            if (updatedShareDetail.OperationType == OperationType.Sell &&
+                !HasEnoughBalanceToSell(updatedShareDetail.Quantity, updatedShareDetail.Price.Value))
+                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
+
+            CalculateAveragePrice(updatedShareDetail, false);
+            CalculateTotals(updatedShareDetail, false);
+
+        }
+
+        public void RemoveShareDetail(ShareDetail shareDetail)
+        {
+            if (!_shareDetails.Any(s => s.Id == shareDetail.Id))
+                throw new InvalidOperationException("you cannot  remove a shareDetail that is not associated in this share");
+
+            _shareDetails.Remove(shareDetail);
 
             CalculateAveragePrice(shareDetail, false);
             CalculateTotals(shareDetail, false);
 
         }
-
-        public void UpdateValues(ShareDetail oldshareDetail, ShareDetail newShareDetail)
-        {
-            if (oldshareDetail.Id != newShareDetail.Id)
-                throw new InvalidOperationException("you cannot update share detail with a new share detail");
-
-            CalculateAveragePrice(oldshareDetail, true);
-            CalculateTotals(oldshareDetail, true);
-
-            if (newShareDetail.OperationType == OperationType.Sell &&
-                !HasEnoughBalanceToSell(newShareDetail.Quantity, newShareDetail.Price.Value))
-            {
-                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
-            };
-
-            CalculateAveragePrice(newShareDetail, false);
-            CalculateTotals(newShareDetail, false);
-
-        }
-
 
         private void CalculateAveragePrice(ShareDetail shareDetail, bool isUpdate)
         {
@@ -160,7 +179,7 @@ namespace MyStocks.Domain.Shares
         }
 
 
-        public bool HasEnoughBalanceToSell(decimal quantityToSell, decimal value)
+        private bool HasEnoughBalanceToSell(decimal quantityToSell, decimal value)
         {
             if (quantityToSell > TotalShares || 
                 (quantityToSell * value) > TotalValueInvested.Value)
