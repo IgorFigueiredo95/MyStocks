@@ -13,6 +13,7 @@ using System.Threading;
 
 namespace MyStocks.Api.Controllers
 {
+    [ApiController]
     [Route("[Controller]")]
     public class SharesController : ControllerBase
     {
