@@ -16,5 +16,8 @@ namespace MyStocks.Domain
         public const int MAX_SHAREDESCRIPTION_LENGTH = 250;
 
         public const int MAX_SHAREDETAILNOTE_LENGTH = 250;
+
+        public const int MAX_PORTFOLIONAME_LENGTH = 40;
+        public const int MAX_PORTFOLIDESCRIPTION_LENGTH = 250;
     }
 }
