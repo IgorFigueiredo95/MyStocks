@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Portfolios.Commands;
+using MyStocks.Application.Portfolios.Commands.AddShareToPortfolio;
 using MyStocks.Contracts;
+using MyStocks.Contracts.Portfolio;
 
 namespace MyStocks.Api.Controllers;
 
@@ -21,12 +23,25 @@ public class PortfolioController : ControllerBase
     {
         var command = new CreatePortfolioCommand(request.Name, request.Description);
 
-        var CommandResult = await _mediator.Send(command);
+        var commandResult = await _mediator.Send(command);
 
-        if (CommandResult.IsFailure)
-            return Responses.Error(HttpContext,CommandResult.Errors.ToList());
+        if (commandResult.IsFailure)
+            return Responses.Error(HttpContext, commandResult.Errors.ToList());
 
-        return Ok(CommandResult.Value);
+        return Ok(commandResult.Value);
     }
 
+    [HttpPost]
+    [Route("Share/{PortfolioId}")]
+    public async Task<IActionResult> AddShare([FromRoute] Guid PortfolioId, [FromBody] AddShareToPortfolioRequest request)
+    {
+        var command = new AddShareToPortfolioCommand(PortfolioId, request.ShareCode);
+
+        var commandResult = await _mediator.Send(command);
+
+        if(commandResult.IsFailure)
+            return Responses.Error(HttpContext,commandResult.Errors.ToList());
+
+        return Ok();
+    }
 }

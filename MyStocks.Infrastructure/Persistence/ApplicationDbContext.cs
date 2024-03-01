@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.Shares;
-using MyStocks.Infrastructure.Migrations;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;

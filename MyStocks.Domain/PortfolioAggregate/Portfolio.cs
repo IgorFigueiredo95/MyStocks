@@ -1,7 +1,9 @@
 ﻿using MyStocks.Domain.Common.Primitives;
 using MyStocks.Domain.PortfolioAggregate.Exceptions;
+using MyStocks.Domain.PortfolioAggregate.ValueObjects;
 using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,9 @@ public class Portfolio : Entity, IAggregateRoot
     public string Name { get; private set; }
     public string? Description { get; private set; }
 
-    private readonly HashSet<Guid> _Shares = new HashSet<Guid>();
-    public IReadOnlyCollection<Guid> Shares { get => _Shares; }
-    public int SharesCount { get =>_Shares.Count(); }
+    private readonly HashSet<AssociatedShares> _ShareIds = new HashSet<AssociatedShares>();
+    public IReadOnlyCollection<AssociatedShares> ShareIds { get => _ShareIds; }
+    public int SharesCount { get; private set; } = 0;
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
@@ -59,22 +61,28 @@ public class Portfolio : Entity, IAggregateRoot
         return this;
     }
 
-    public void AddShare(Share Share)
+    public void AddShare(Guid shareId)
     {
-        var inserted = _Shares.Add(Share.Id);
+        var portfolioShare = AssociatedShares.Create(this.Id, shareId);
+        var inserted = _ShareIds.Add(portfolioShare);
 
-        if (inserted)
-            UpdatedAt = DateTime.UtcNow;
+        if (!inserted)
+            throw new InvalidOperationException(nameof(portfolioShare));
+
+        UpdatedAt = DateTime.UtcNow;
+        SharesCount++;
     }
 
-    public void Remove(Share Share)
+    public void RemoveShare(Guid shareId)
     {
-       var removed = _Shares.Remove(Share.Id);
+        var portfolioshare = AssociatedShares.Create(this.Id, shareId);
+        var removed = _ShareIds.Remove(portfolioshare);
 
-        if(!removed)
-            throw new InvalidOperationException(nameof(Share));
-        else
-            UpdatedAt = DateTime.UtcNow;
+        if (!removed)
+            throw new InvalidOperationException(nameof(portfolioshare));
+
+        UpdatedAt = DateTime.UtcNow;
+        SharesCount--;
     }
     
 }

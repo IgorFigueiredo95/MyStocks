@@ -2,6 +2,7 @@
 using MyStocks.Application.Queries;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;

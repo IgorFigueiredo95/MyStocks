@@ -2,6 +2,7 @@
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Exceptions;
+using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Shares.Exceptions;
 using MyStocks.Domain.Shares.Exceptions.Shares;
@@ -17,176 +18,176 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyStocks.Domain.Shares
+namespace MyStocks.Domain.SharesAggregate;
+
+//Aggregate Root => raiz da agregação share.
+//garante a consistência do aggregate
+//Agregates filhos "ShareDetail" são controlados/persistidos por aqui. para garantir a consistência.
+//https://martinfowler.com/bliki/DDD_Aggregate.html
+//https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
+public class Share : Entity, IAggregateRoot
 {
-    //Aggregate Root => raiz da agregação share.
-    //garante a consistência do aggregate
-    //Agregates filhos "ShareDetail" são controlados/persistidos por aqui. para garantir a consistência.
-    //https://martinfowler.com/bliki/DDD_Aggregate.html
-    //https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
-    public class Share : Entity, IAggregateRoot
+    public string Code { get; private set; }
+    public string Name { get; private set; }
+    public string? Description { get; private set; }
+    public  ShareTypes ShareType { get; private set; }
+    public Currency TotalValueInvested { get; private set; }
+    public decimal TotalShares { get; private set; }
+    public Currency AveragePrice { get; private set; }
+
+    private List<ShareDetail> _shareDetails = new List<ShareDetail>();
+    public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
+
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    
+    //ef compatibility
+    private Share():base(Guid.Empty){}
+
+    private Share(Guid id, string code, string name, string? description, ShareTypes shareType, CurrencyTypes currencyType) : base(id)
     {
-        public string Code { get; private set; }
-        public string Name { get; private set; }
-        public string? Description { get; private set; }
-        public  ShareTypes ShareType { get; private set; }
-        public Currency TotalValueInvested { get; private set; }
-        public decimal TotalShares { get; private set; }
-        public Currency AveragePrice { get; private set; }
+        Code = code;
+        Name = name;
+        Description = description;
+        ShareType = shareType;
+        CreatedAt = DateTime.Now;
+        TotalValueInvested = Currency.Create(currencyType, 0);
+        AveragePrice = Currency.Create(currencyType, 0);
+    }
 
-        private List<ShareDetail> _shareDetails = new List<ShareDetail>();
-        public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
-        public DateTime CreatedAt { get; private set; }
-        public DateTime UpdatedAt { get; private set; }
-        
-        //ef compatibility
-        private Share():base(Guid.Empty){}
+    public static Share Create(string code, string name, string? description, ShareTypes shareType, CurrencyTypes currencyType)
+    {
+        if (code.Length > Constants.MAX_CODE_LENGTH)
+            throw new InvalidLengthShareCodeException(nameof(code), 1, Constants.MAX_CODE_LENGTH);
 
-        private Share(Guid id, string code, string name, string? description, ShareTypes shareType, CurrencyTypes currencyType) : base(id)
-        {
-            Code = code;
-            Name = name;
-            Description = description;
-            ShareType = shareType;
-            CreatedAt = DateTime.Now;
-            TotalValueInvested = Currency.Create(currencyType, 0);
-            AveragePrice = Currency.Create(currencyType, 0);
-        }
+        if (name.Length > Constants.MAX_SHARENAME_LENGTH)
+            throw new InvalidLengthShareNameException(nameof(name), Constants.MAX_SHARENAME_LENGTH);
 
-        public static Share Create(string code, string name, string? description, ShareTypes shareType, CurrencyTypes currencyType)
-        {
-            if (code.Length > Constants.MAX_CODE_LENGTH)
-                throw new InvalidLengthShareCodeException(nameof(code), 1, Constants.MAX_CODE_LENGTH);
+        if (name.Length == 0)
+            throw new NameCannotBeEmptyShareException(nameof(name), new ArgumentNullException(nameof(name)));
 
-            if (name.Length > Constants.MAX_SHARENAME_LENGTH)
-                throw new InvalidLengthShareNameException(nameof(name), Constants.MAX_SHARENAME_LENGTH);
+        if (description?.Length > Constants.MAX_SHAREDESCRIPTION_LENGTH)
+            throw new InvalidLengthShareDescriptionException(nameof(description), Constants.MAX_SHAREDESCRIPTION_LENGTH);
 
-            if (name.Length == 0)
-                throw new NameCannotBeEmptyShareException(nameof(name), new ArgumentNullException(nameof(name)));
+        if (currencyType is null)
+            throw new CurrencyTypeCannotBeEmptyShareException(nameof(currencyType), new ArgumentNullException(nameof(currencyType)));
 
-            if (description?.Length > Constants.MAX_SHAREDESCRIPTION_LENGTH)
-                throw new InvalidLengthShareDescriptionException(nameof(description), Constants.MAX_SHAREDESCRIPTION_LENGTH);
+        return new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
+    }
 
-            if (currencyType is null)
-                throw new CurrencyTypeCannotBeEmptyShareException(nameof(currencyType), new ArgumentNullException(nameof(currencyType)));
+    public Share Update(string? name, string? description, ShareTypes? shareTypes)
+    {
+        if (name?.Length > Constants.MAX_SHARENAME_LENGTH)
+            throw new InvalidLengthShareNameException(nameof(name), 1, Constants.MAX_CODE_LENGTH);
 
-            return new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
-        }
+        if (description?.Length > Constants.MAX_SHAREDESCRIPTION_LENGTH)
+            throw new InvalidLengthShareDescriptionException(nameof(description), Constants.MAX_SHAREDESCRIPTION_LENGTH);
 
-        public Share Update(string? name, string? description, ShareTypes? shareTypes)
-        {
-            if (name?.Length > Constants.MAX_SHARENAME_LENGTH)
-                throw new InvalidLengthShareNameException(nameof(name), 1, Constants.MAX_CODE_LENGTH);
+        Name = name ?? Name;
+        Description = description ?? Description;
+        ShareType = shareTypes ?? ShareType;
 
-            if (description?.Length > Constants.MAX_SHAREDESCRIPTION_LENGTH)
-                throw new InvalidLengthShareDescriptionException(nameof(description), Constants.MAX_SHAREDESCRIPTION_LENGTH);
+        UpdatedAt = DateTime.UtcNow;
 
-            Name = name ?? Name;
-            Description = description ?? Description;
-            ShareType = shareTypes ?? ShareType;
+        return this;
+    }
 
-            UpdatedAt = DateTime.UtcNow;
+    public void AddShareDetail(ShareDetail shareDetail)
+    {
+        shareDetail.SetParentShare(Id);
 
-            return this;
-        }
+        if (shareDetail.OperationType == OperationType.Sell &&
+        !HasEnoughBalanceToSell(shareDetail.Quantity, shareDetail.Price.Value))
+            throw new InvalidOperationException("You do not have enough balance to sell this amount.");
 
-        public void AddShareDetail(ShareDetail shareDetail)
-        {
-            shareDetail.SetParentShareId(Id);
+        CalculateAveragePrice(shareDetail,false);
+        CalculateTotals(shareDetail, false);
 
-            if (shareDetail.OperationType == OperationType.Sell &&
-            !HasEnoughBalanceToSell(shareDetail.Quantity, shareDetail.Price.Value))
-                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
+        _shareDetails.Add(shareDetail);
+    }
 
-            CalculateAveragePrice(shareDetail,false);
-            CalculateTotals(shareDetail, false);
+    public void UpdateShareDetail(ShareDetail oldshareDetail, string? note, decimal? quantity, Currency? price)
+    {
 
-            _shareDetails.Add(shareDetail);
-        }
+        if (oldshareDetail.ShareId != Id || oldshareDetail.ShareId == Guid.Empty)
+            throw new InvalidOperationException("This Share Detail does not belong to this Share!");
 
-        public void UpdateShareDetail(ShareDetail oldshareDetail, string? note, decimal? quantity, Currency? price)
-        {
+        CalculateAveragePrice(oldshareDetail, true);
+        CalculateTotals(oldshareDetail, true);
 
-            if (oldshareDetail.ShareId != Id || oldshareDetail.ShareId == Guid.Empty)
-                throw new InvalidOperationException("This Share Detail does not belong to this Share!");
+        var updatedShareDetail = oldshareDetail.Update(note, quantity, price);
 
-            CalculateAveragePrice(oldshareDetail, true);
-            CalculateTotals(oldshareDetail, true);
+        if (updatedShareDetail.OperationType == OperationType.Sell &&
+            !HasEnoughBalanceToSell(updatedShareDetail.Quantity, updatedShareDetail.Price.Value))
+            throw new InvalidOperationException("You do not have enough balance to sell this amount.");
 
-            var updatedShareDetail = oldshareDetail.Update(note, quantity, price);
-
-            if (updatedShareDetail.OperationType == OperationType.Sell &&
-                !HasEnoughBalanceToSell(updatedShareDetail.Quantity, updatedShareDetail.Price.Value))
-                throw new InvalidOperationException("You do not have enough balance to sell this amount.");
-
-            CalculateAveragePrice(updatedShareDetail, false);
-            CalculateTotals(updatedShareDetail, false);
-
-        }
-
-        public void RemoveShareDetail(ShareDetail shareDetail)
-        {
-            if (!_shareDetails.Any(s => s.Id == shareDetail.Id))
-                throw new InvalidOperationException("you cannot  remove a shareDetail that is not associated in this share");
-
-            _shareDetails.Remove(shareDetail);
-
-            CalculateAveragePrice(shareDetail, false);
-            CalculateTotals(shareDetail, false);
-
-        }
-
-        private void CalculateAveragePrice(ShareDetail shareDetail, bool isUpdate)
-        {
-
-            if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
-                shareDetail.OperationType == OperationType.Sell && isUpdate)
-            {
-                decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
-                                                (TotalShares + shareDetail.Quantity);
-
-                AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
-            }
-            else
-            {
-                decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
-                                                 (TotalShares - shareDetail.Quantity);
-
-                AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
-            }
-
-
-        }
-
-        private void CalculateTotals(ShareDetail shareDetail, bool isUpdate)
-        {
-            if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
-                shareDetail.OperationType == OperationType.Sell && isUpdate)
-            {
-                TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
-                   TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)
-                   );
-
-                TotalShares += shareDetail.Quantity;
-            }
-            else
-            {
-                TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
-                TotalValueInvested.Value - shareDetail.Price.Value * shareDetail.Quantity);
-
-                TotalShares -= shareDetail.Quantity;
-            }
-        }
-
-
-        private bool HasEnoughBalanceToSell(decimal quantityToSell, decimal value)
-        {
-            if (quantityToSell > TotalShares || 
-                (quantityToSell * value) > TotalValueInvested.Value)
-                return false;
-
-            return true;
-        }
+        CalculateAveragePrice(updatedShareDetail, false);
+        CalculateTotals(updatedShareDetail, false);
 
     }
+
+    public void RemoveShareDetail(ShareDetail shareDetail)
+    {
+        if (!_shareDetails.Any(s => s.Id == shareDetail.Id))
+            throw new InvalidOperationException("you cannot  remove a shareDetail that is not associated in this share");
+
+        _shareDetails.Remove(shareDetail);
+
+        CalculateAveragePrice(shareDetail, false);
+        CalculateTotals(shareDetail, false);
+
+    }
+
+    private void CalculateAveragePrice(ShareDetail shareDetail, bool isUpdate)
+    {
+
+        if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
+            shareDetail.OperationType == OperationType.Sell && isUpdate)
+        {
+            decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
+                                            (TotalShares + shareDetail.Quantity);
+
+            AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
+        }
+        else
+        {
+            decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
+                                             (TotalShares - shareDetail.Quantity);
+
+            AveragePrice = Currency.Create(AveragePrice.CurrencyType, price);
+        }
+
+
+    }
+
+    private void CalculateTotals(ShareDetail shareDetail, bool isUpdate)
+    {
+        if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
+            shareDetail.OperationType == OperationType.Sell && isUpdate)
+        {
+            TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
+               TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)
+               );
+
+            TotalShares += shareDetail.Quantity;
+        }
+        else
+        {
+            TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
+            TotalValueInvested.Value - shareDetail.Price.Value * shareDetail.Quantity);
+
+            TotalShares -= shareDetail.Quantity;
+        }
+    }
+
+
+    private bool HasEnoughBalanceToSell(decimal quantityToSell, decimal value)
+    {
+        if (quantityToSell > TotalShares || 
+            (quantityToSell * value) > TotalValueInvested.Value)
+            return false;
+
+        return true;
+    }
+
 }

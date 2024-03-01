@@ -31,6 +31,7 @@ public class PortfolioRepository : IPortfolioRepository
     {
         return await _context.Portfolios
             .Where(x => x.Id == id)
+            .Include(x=>x.ShareIds)
             .FirstAsync();
     }
 
