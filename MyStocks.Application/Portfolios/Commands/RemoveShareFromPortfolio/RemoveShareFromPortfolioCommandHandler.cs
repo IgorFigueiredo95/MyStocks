@@ -4,28 +4,29 @@ using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.SharesAggregate.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyStocks.Application.Portfolios.Commands.AddShareToPortfolio;
+namespace MyStocks.Application.Portfolios.Commands.RemoveShareFromPortfolio;
 
-public class AddShareToPortfolioCommandHandler : IRequestHandler<AddShareToPortfolioCommand, Result>
+public class RemoveShareFromPortfolioCommandHandler : IRequestHandler<RemoveShareFromPortfolioCommand, Result>
 {
-    private readonly IShareRepository _shareRepository;
     private readonly IPortfolioRepository _portfolioRepository;
+    private readonly IShareRepository _shareRepository;
     private readonly IUnitOfWork _unitOfWork;
-    public AddShareToPortfolioCommandHandler(
-        IShareRepository shareRepository,
+    public RemoveShareFromPortfolioCommandHandler(
         IPortfolioRepository portfolioRepository,
+        IShareRepository shareRepository,
         IUnitOfWork unitOfWork)
     {
-        _shareRepository = shareRepository;
         _portfolioRepository = portfolioRepository;
+        _shareRepository = shareRepository;
         _unitOfWork = unitOfWork;
     }
-    public async Task<Result> Handle(AddShareToPortfolioCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RemoveShareFromPortfolioCommand request, CancellationToken cancellationToken)
     {
         var portfolio = await _portfolioRepository.GetByIdAsync(request.PortfolioId);
 
@@ -39,7 +40,8 @@ public class AddShareToPortfolioCommandHandler : IRequestHandler<AddShareToPortf
 
         try
         {
-            portfolio.AddShare(ShareId.Create(share.Id));
+            //TODO: não faz sentido criar um VO SHareId para o Share.Id 
+            portfolio.RemoveShare(ShareId.Create(share.Id));
             await _unitOfWork.CommitAsync();
         }
         catch (Exception ex)
@@ -48,5 +50,6 @@ public class AddShareToPortfolioCommandHandler : IRequestHandler<AddShareToPortf
         }
 
         return Result.ReturnSuccess();
+
     }
 }

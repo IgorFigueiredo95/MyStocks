@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyStocks.Domain;
 using MyStocks.Domain.PortfolioAggregate;
+using MyStocks.Domain.SharesAggregate.ValueObjects;
 using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
@@ -43,16 +44,15 @@ public class PortfolioModelBuilder : IEntityTypeConfiguration<Portfolio>
         builder.OwnsMany(x => x.ShareIds,
             navigationBuilder =>
             {
-                navigationBuilder.HasKey(nb => new { nb.SharedId, nb.PortfolioId });
+                navigationBuilder.Property(x => x.ShareId)
+                .HasConversion(dest => dest.Id, src => ShareId.Create(src));
+
+                navigationBuilder.HasKey(nb => new { nb.PortfolioId, nb.ShareId});
+
                 navigationBuilder.Property(x => x.CreatedAt)
                     .HasConversion(
                         destDate => DateTime.SpecifyKind(destDate, DateTimeKind.Utc),
                         srcDate => DateTime.SpecifyKind(srcDate, DateTimeKind.Utc));
-                navigationBuilder.Property(x => x.SharedId)
-                    .ValueGeneratedNever();
-                navigationBuilder.Property(x => x.PortfolioId)
-                   .ValueGeneratedNever();
             });
-
     }
 }

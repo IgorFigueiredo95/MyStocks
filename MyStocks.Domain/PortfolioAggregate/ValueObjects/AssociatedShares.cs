@@ -1,6 +1,6 @@
 ﻿using MyStocks.Domain.Primitives;
 using System;
-using System.Collections.Generic;
+using MyStocks.Domain.SharesAggregate.ValueObjects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,26 +9,26 @@ namespace MyStocks.Domain.PortfolioAggregate.ValueObjects;
 
 public class AssociatedShares : ValueObject
 {
+    public ShareId ShareId { get; private set; }
+
     public Guid PortfolioId { get; private set; }
-    public Guid SharedId { get; private set; }
 
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
     public override List<object> GetAtomicValues()
     {
-        return new List<object> { PortfolioId, SharedId };
+        return new List<object> { ShareId };
     }
 
 
     private AssociatedShares() { }
 
-    public AssociatedShares(Guid portfolioId, Guid shareId)
+    public AssociatedShares(ShareId shareId)
     {
-        PortfolioId = portfolioId;
-        SharedId = shareId;
+        ShareId = shareId;
     }
-    public static AssociatedShares Create(Guid portfolioId, Guid shareId)
+    public static AssociatedShares Create(ShareId shareId)
     {
-        return new AssociatedShares( portfolioId, shareId);
+        return new AssociatedShares( shareId);
     }
 }
