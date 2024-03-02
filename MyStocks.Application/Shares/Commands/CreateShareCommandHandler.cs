@@ -7,6 +7,7 @@ using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System.Data;
 
 namespace MyStocks.Application.Shares.Commands

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyStocks.Domain;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +43,8 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
 
             builder.OwnsOne(x => x.AveragePrice);
 
-            builder.HasMany(x => x.ShareDetails).
-                WithOne();
+            builder.HasMany(x => x.ShareDetails)
+                .WithOne();
 
             builder.Property(x => x.CreatedAt)
                 //Todo:Incluso para compatibilidade com formato de data EF https://duongnt.com/datetime-net6-postgresql/

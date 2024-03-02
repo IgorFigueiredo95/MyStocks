@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MyStocks.Domain.Common.Primitives;
 using MyStocks.Domain.Primitives;
+using MyStocks.Domain.SharesAggregate;
 
 namespace MyStocks.Domain.Abstractions;
 

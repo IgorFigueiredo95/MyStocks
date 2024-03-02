@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyStocks.Infrastructure;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyStocks.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240301012823_fix_portfolio_relationship_5")]
+    partial class fix_portfolio_relationship_5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,16 +165,19 @@ namespace MyStocks.Infrastructure.Migrations
                 {
                     b.OwnsMany("MyStocks.Domain.PortfolioAggregate.ValueObjects.AssociatedShares", "ShareIds", b1 =>
                         {
-                            b1.Property<Guid>("PortfolioId")
+                            b1.Property<Guid>("SharedId")
+                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
-                            b1.Property<Guid>("ShareId")
+                            b1.Property<Guid>("PortfolioId")
                                 .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAt")
                                 .HasColumnType("timestamp with time zone");
 
-                            b1.HasKey("PortfolioId", "ShareId");
+                            b1.HasKey("SharedId", "PortfolioId");
+
+                            b1.HasIndex("PortfolioId");
 
                             b1.ToTable("AssociatedShares");
 

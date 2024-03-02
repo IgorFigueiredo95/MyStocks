@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyStocks.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240124034020_add_CurrencyTypes_Is-Default")]
-    partial class add_CurrencyTypes_IsDefault
+    [Migration("20240301010838_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,7 +60,36 @@ namespace MyStocks.Infrastructure.Migrations
                     b.ToTable("CurrencyTypes");
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Shares.Share", b =>
+            modelBuilder.Entity("MyStocks.Domain.PortfolioAggregate.Portfolio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<int>("SharesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Portfolios");
+                });
+
+            modelBuilder.Entity("MyStocks.Domain.SharesAggregate.Share", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -100,10 +129,9 @@ namespace MyStocks.Infrastructure.Migrations
                     b.ToTable("Shares");
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Shares.ShareDetail", b =>
+            modelBuilder.Entity("MyStocks.Domain.SharesAggregate.ShareDetail", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -113,16 +141,14 @@ namespace MyStocks.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<int>("OperandType")
-                        .HasColumnType("integer");
+                    b.Property<int>("OperationType")
+                        .HasColumnType("integer")
+                        .HasColumnName("OperationType");
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("numeric");
 
                     b.Property<Guid>("ShareId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ShareId1")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -132,12 +158,34 @@ namespace MyStocks.Infrastructure.Migrations
 
                     b.HasIndex("ShareId");
 
-                    b.HasIndex("ShareId1");
-
                     b.ToTable("ShareDetails");
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Shares.Share", b =>
+            modelBuilder.Entity("MyStocks.Domain.PortfolioAggregate.Portfolio", b =>
+                {
+                    b.OwnsMany("MyStocks.Domain.PortfolioAggregate.ValueObjects.AssociatedShares", "ShareIds", b1 =>
+                        {
+                            b1.Property<Guid>("SharedId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("PortfolioId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("SharedId", "PortfolioId");
+
+                            b1.HasIndex("PortfolioId");
+
+                            b1.ToTable("AssociatedShares");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PortfolioId");
+                        });
+
+                    b.Navigation("ShareIds");
+                });
+
+            modelBuilder.Entity("MyStocks.Domain.SharesAggregate.Share", b =>
                 {
                     b.OwnsOne("MyStocks.Domain.Currencies.Currency", "AveragePrice", b1 =>
                         {
@@ -204,17 +252,13 @@ namespace MyStocks.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Shares.ShareDetail", b =>
+            modelBuilder.Entity("MyStocks.Domain.SharesAggregate.ShareDetail", b =>
                 {
-                    b.HasOne("MyStocks.Domain.Shares.Share", "Share")
-                        .WithMany()
+                    b.HasOne("MyStocks.Domain.SharesAggregate.Share", null)
+                        .WithMany("ShareDetails")
                         .HasForeignKey("ShareId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MyStocks.Domain.Shares.Share", null)
-                        .WithMany("SharesDetails")
-                        .HasForeignKey("ShareId1");
 
                     b.OwnsOne("MyStocks.Domain.Currencies.Currency", "Price", b1 =>
                         {
@@ -247,13 +291,11 @@ namespace MyStocks.Infrastructure.Migrations
 
                     b.Navigation("Price")
                         .IsRequired();
-
-                    b.Navigation("Share");
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Shares.Share", b =>
+            modelBuilder.Entity("MyStocks.Domain.SharesAggregate.Share", b =>
                 {
-                    b.Navigation("SharesDetails");
+                    b.Navigation("ShareDetails");
                 });
 #pragma warning restore 612, 618
         }

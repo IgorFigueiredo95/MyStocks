@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MyStocks.Application;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Currencies;
+using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Infrastructure.Currencies;
 using MyStocks.Infrastructure.Repositories;
 using System.Configuration;
@@ -17,6 +18,7 @@ public static class InfraDInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ICurrencyTypesRepository, CurrencyTypesRepository>();
         services.AddScoped<IShareRepository, ShareRepository>();
+        services.AddScoped<IPortfolioRepository, PortfolioRepository>();
         services.AddDbContext<ApplicationDbContext>();
 
         return services;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,26 @@ public abstract class ValueObject : IEquatable<ValueObject>, IEqualityComparer<V
     public int GetHashCode([DisallowNull] ValueObject obj)
     {
         throw new NotImplementedException();
+    }
+
+    public static bool operator ==(ValueObject? one, ValueObject? other)
+    {
+
+        if (one is null && other is null)
+            return true;
+
+        if (!one.GetType().Equals(other.GetType()))
+            return false;
+
+        var equal = one.ValuesAreEqual(other);
+        return equal;
+    }
+
+    public static bool operator !=(ValueObject? one, ValueObject? other)
+    {
+        var equal = (one == other);
+
+        return !equal;
     }
 }
 

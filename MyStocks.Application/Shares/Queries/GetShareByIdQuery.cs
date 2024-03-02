@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;

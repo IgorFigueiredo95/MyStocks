@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MyStocks.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class add_CurrencyTypes_IsDefault : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,22 @@ namespace MyStocks.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CurrencyTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Portfolios",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    Description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
+                    SharesCount = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Portfolios", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,6 +77,24 @@ namespace MyStocks.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AssociatedShares",
+                columns: table => new
+                {
+                    PortfolioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SharedId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssociatedShares", x => new { x.SharedId, x.PortfolioId });
+                    table.ForeignKey(
+                        name: "FK_AssociatedShares_Portfolios_PortfolioId",
+                        column: x => x.PortfolioId,
+                        principalTable: "Portfolios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShareDetails",
                 columns: table => new
                 {
@@ -70,10 +104,9 @@ namespace MyStocks.Infrastructure.Migrations
                     Quantity = table.Column<decimal>(type: "numeric", nullable: false),
                     Price_CurrencyTypeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Price_Value = table.Column<decimal>(type: "numeric", nullable: false),
-                    OperandType = table.Column<int>(type: "integer", nullable: false),
+                    OperationType = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ShareId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,12 +123,12 @@ namespace MyStocks.Infrastructure.Migrations
                         principalTable: "Shares",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ShareDetails_Shares_ShareId1",
-                        column: x => x.ShareId1,
-                        principalTable: "Shares",
-                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssociatedShares_PortfolioId",
+                table: "AssociatedShares",
+                column: "PortfolioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CurrencyTypes_Code",
@@ -120,11 +153,6 @@ namespace MyStocks.Infrastructure.Migrations
                 column: "ShareId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShareDetails_ShareId1",
-                table: "ShareDetails",
-                column: "ShareId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Shares_AveragePrice_CurrencyTypeId",
                 table: "Shares",
                 column: "AveragePrice_CurrencyTypeId");
@@ -145,7 +173,13 @@ namespace MyStocks.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AssociatedShares");
+
+            migrationBuilder.DropTable(
                 name: "ShareDetails");
+
+            migrationBuilder.DropTable(
+                name: "Portfolios");
 
             migrationBuilder.DropTable(
                 name: "Shares");

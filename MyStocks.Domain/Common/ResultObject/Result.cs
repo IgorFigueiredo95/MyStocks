@@ -39,6 +39,15 @@ public class Result
         _Errors.Add(error);
     }
 
+    public static Result ReturnSuccess()
+    {
+        return new Result(true);
+    }
+
+    public static Result ReturnFailure()
+    {
+        return new Result(false);
+    }
 
     public static implicit operator Result(bool value)
     {

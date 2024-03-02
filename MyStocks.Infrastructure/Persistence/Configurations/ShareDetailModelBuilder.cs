@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MyStocks.Domain;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Shares;
+using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,10 +25,11 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id)
                 .ValueGeneratedNever();
-
-            builder.HasOne(x => x.Share)
-                .WithMany()
-                .HasForeignKey(x => x.ShareId)
+            
+            //dessa forma fica sem navigation property na child entity
+            builder.HasOne<Share>()
+                .WithMany(x => x.ShareDetails)
+                .HasForeignKey(x=> x.ShareId)
                 .IsRequired();
 
             builder.Property(x => x.Note)
@@ -39,6 +41,7 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.OwnsOne(x => x.Price);
 
             builder.Property(x => x.OperationType)
+                .HasColumnName("OperationType")
                 .IsRequired();
 
             builder.Property(x => x.CreatedAt).HasConversion(

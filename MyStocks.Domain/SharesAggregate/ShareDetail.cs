@@ -15,14 +15,10 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace MyStocks.Domain.Shares;
-
+namespace MyStocks.Domain.SharesAggregate;
 public class ShareDetail : Entity
 {
     public Guid ShareId { get; private set; }
-    //todo: nav property se não ignorar esse json, chega a uma referência infita ao retornar da APi de get de share. dando erro
-    [JsonIgnore]
-    public Share Share { get; private set; }
     public string? Note { get; private set; }
     public decimal Quantity { get; private set; }
     public Currency Price { get; private set; }
@@ -37,7 +33,7 @@ public class ShareDetail : Entity
 
     private ShareDetail(Guid id, Guid shareId, decimal quantity, Currency price, OperationType operationType, string? note) : base(id)
     {
-        ShareId = shareId;
+        //ShareId = shareId;
         Quantity = quantity;
         Price = price;
         OperationType = operationType;
@@ -45,7 +41,7 @@ public class ShareDetail : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    internal void SetParentShareId(Guid id) => ShareId = id;
+    internal void SetParentShare(Guid shareId) => ShareId = shareId;
 
     public static ShareDetail Create(decimal quantity, Currency price, string operationTypeCode, string? note)
 
