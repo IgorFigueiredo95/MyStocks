@@ -31,7 +31,7 @@ public class ShareDetail : Entity
     { }
     
 
-    private ShareDetail(Guid id, Guid shareId, decimal quantity, Currency price, OperationType operationType, string? note) : base(id)
+    private ShareDetail(Guid id, decimal quantity, Currency price, OperationType operationType, string? note) : base(id)
     {
         //ShareId = shareId;
         Quantity = quantity;
@@ -40,8 +40,6 @@ public class ShareDetail : Entity
         Note = note;
         CreatedAt = DateTime.UtcNow;
     }
-
-    internal void SetParentShare(Guid shareId) => ShareId = shareId;
 
     public static ShareDetail Create(decimal quantity, Currency price, string operationTypeCode, string? note)
 

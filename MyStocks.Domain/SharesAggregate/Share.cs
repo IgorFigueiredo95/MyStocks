@@ -94,7 +94,6 @@ public class Share : Entity, IAggregateRoot
 
     public void AddShareDetail(ShareDetail shareDetail)
     {
-        shareDetail.SetParentShare(Id);
 
         if (shareDetail.OperationType == OperationType.Sell &&
         !HasEnoughBalanceToSell(shareDetail.Quantity, shareDetail.Price.Value))
