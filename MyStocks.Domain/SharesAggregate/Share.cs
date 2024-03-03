@@ -108,10 +108,12 @@ public class Share : Entity, IAggregateRoot
 
     public void UpdateShareDetail(ShareDetail oldshareDetail, string? note, decimal? quantity, Currency? price)
     {
-
+        // 1º remove valores do sharedetail dos agregados totais 
+        // 2º atualiza sharedetail
+        //3º atualiza valro dos agregados totais com valor do sharedetail atualizado.
         if (oldshareDetail.ShareId != Id || oldshareDetail.ShareId == Guid.Empty)
             throw new InvalidOperationException("This Share Detail does not belong to this Share!");
-
+        
         CalculateAveragePrice(oldshareDetail, true);
         CalculateTotals(oldshareDetail, true);
 
@@ -133,16 +135,16 @@ public class Share : Entity, IAggregateRoot
 
         _shareDetails.Remove(shareDetail);
 
-        CalculateAveragePrice(shareDetail, false);
-        CalculateTotals(shareDetail, false);
+        CalculateAveragePrice(shareDetail, true);
+        CalculateTotals(shareDetail, true);
 
     }
 
-    private void CalculateAveragePrice(ShareDetail shareDetail, bool isUpdate)
+    private void CalculateAveragePrice(ShareDetail shareDetail, bool isShareDetailRemove)
     {
 
-        if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
-            shareDetail.OperationType == OperationType.Sell && isUpdate)
+        if (shareDetail.OperationType == OperationType.Buy && !isShareDetailRemove ||
+            shareDetail.OperationType == OperationType.Sell && isShareDetailRemove)
         {
             decimal price = (TotalShares * AveragePrice.Value + shareDetail.Price.Value * shareDetail.Quantity) /
                                             (TotalShares + shareDetail.Quantity);
@@ -160,10 +162,10 @@ public class Share : Entity, IAggregateRoot
 
     }
 
-    private void CalculateTotals(ShareDetail shareDetail, bool isUpdate)
+    private void CalculateTotals(ShareDetail shareDetail, bool IsShareDetailRemove)
     {
-        if (shareDetail.OperationType == OperationType.Buy && !isUpdate ||
-            shareDetail.OperationType == OperationType.Sell && isUpdate)
+        if (shareDetail.OperationType == OperationType.Buy && !IsShareDetailRemove ||
+            shareDetail.OperationType == OperationType.Sell && IsShareDetailRemove)
         {
             TotalValueInvested = Currency.Create(TotalValueInvested.CurrencyType,
                TotalValueInvested.Value + (shareDetail.Price.Value * shareDetail.Quantity)

@@ -5,6 +5,7 @@ using MyStocks.Application.Currencies;
 using MyStocks.Application.Queries;
 using MyStocks.Application.Shares;
 using MyStocks.Application.Shares.Commands;
+using MyStocks.Application.Shares.Commands.DeleteShareDetail;
 using MyStocks.Application.Shares.Queries;
 using MyStocks.Contracts.Shares;
 using MyStocks.Domain.Enums;
@@ -38,13 +39,13 @@ namespace MyStocks.Api.Controllers
 
             if (result.IsFailure)
                 return Responses.Error(HttpContext, result.Errors.ToList());
-               
+
 
             return Ok(result.Value);
         }
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateShare( Guid id, UpdateShareRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateShare(Guid id, UpdateShareRequest request, CancellationToken cancellationToken)
         {
             var command = new UpdateShareCommand(
                 id,
@@ -80,10 +81,10 @@ namespace MyStocks.Api.Controllers
                 request.Price);
 
 
-              var result = await _mediator.Send(command, cancellationToken);
+            var result = await _mediator.Send(command, cancellationToken);
 
             if (result.IsFailure)
-               return Responses.Error(HttpContext,result.Errors.ToList());
+                return Responses.Error(HttpContext, result.Errors.ToList());
 
             return Ok();
 
@@ -91,7 +92,7 @@ namespace MyStocks.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetShareById(Guid id, CancellationToken cancellationToken) 
+        public async Task<IActionResult> GetShareById(Guid id, CancellationToken cancellationToken)
         {
             var query = new GetShareByIdQuery(id);
             GetShareByIdResponse response;
@@ -117,7 +118,7 @@ namespace MyStocks.Api.Controllers
                 {
                     Title = "One or more errors has ocourred.",
                     Detail = "A validation error error has ocourred. verify you request"
-                   //new Dictionary<string, string>().Add("error", $"{ex.Message}")
+                    //new Dictionary<string, string>().Add("error", $"{ex.Message}")
                 });
             }
 
@@ -135,11 +136,11 @@ namespace MyStocks.Api.Controllers
                 request.Price,
                 request.OperationTypeCode);
 
-          
-                var result = await _mediator.Send(command);
-            
-                if(result.IsFailure)
-               return  Responses.Error(HttpContext, result.Errors.ToList());
+
+            var result = await _mediator.Send(command);
+
+            if (result.IsFailure)
+                return Responses.Error(HttpContext, result.Errors.ToList());
 
             return Ok(result.Value);
         }
@@ -149,13 +150,27 @@ namespace MyStocks.Api.Controllers
         public async Task<IActionResult> GetShareDetaiListPagination(
             [FromRoute] string shareCode,
             [FromQuery] int offSet,
-            [FromQuery] int limit) 
+            [FromQuery] int limit)
         {
             var query = new GetShareDetailListByCodeQuery(shareCode, offSet, limit);
             var result = await _mediator.Send(query);
 
             if (result.IsFailure)
                 return Responses.Error(HttpContext, result.Errors.ToList());
+
+            return Ok(result.Value);
+        }
+
+        [HttpDelete]
+        [Route("shareDetail/{id}")]
+        public async Task<IActionResult> DeleteShareDetailById([FromRoute] Guid id)
+        {
+            var command = new DeleteShareDetailCommand(id);
+
+            var result = await _mediator.Send(command);
+
+            if (result.IsFailure)
+                return Responses.Error(HttpContext,result.Errors.ToList());
 
             return Ok(result.Value);
         }
