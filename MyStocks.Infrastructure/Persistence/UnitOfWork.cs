@@ -1,4 +1,6 @@
-﻿using MyStocks.Application;
+﻿using MediatR;
+using MyStocks.Application;
+using MyStocks.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,26 @@ namespace MyStocks.Infrastructure;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
-    public UnitOfWork(ApplicationDbContext context)
+    private readonly IMediator _mediator;
+    public UnitOfWork(ApplicationDbContext context, IMediator mediator)
     {
 
         _context = context;
-
+        _mediator = mediator;
+    }
+    public void DispatchDomainEvents(IReadOnlyCollection<IdomainEvent> domainEvents)
+    {
+        foreach (var domainEvent in domainEvents)
+        {
+            var domEvent  = GetNotificationFromDomainEvent(domainEvent);
+            _mediator.Publish(domEvent);
+        }
+    }
+    private INotification GetNotificationFromDomainEvent(IdomainEvent domainEvent)
+    {
+        INotification notificationAbstraction = null;
+       var notification =  Activator.CreateInstance(domainEvent.GetType(), notificationAbstraction);
+        return (INotification)notification;
     }
     public async  Task CommitAsync()
     {

@@ -55,7 +55,7 @@ public class ShareDetail : Entity
             throw new InvalidOperationTypeShareDetailException(nameof(operationTypeCode));
 
 
-        return new ShareDetail(Guid.NewGuid(), Guid.Empty, quantity, price, parsedOperationType, note);
+        return new ShareDetail(Guid.NewGuid(), quantity, price, parsedOperationType, note);
 
 
     }
