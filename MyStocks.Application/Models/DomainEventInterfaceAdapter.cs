@@ -30,9 +30,9 @@ public static class INotificatonAdapter
         //adiciona o domainEvent recebido para a propriedade da classe
         //faz o cast para a Inotification para retornarmos como resposta ao Inotification
         var eventOfDomainEvent = (INotification)Activator
-            .CreateInstance(
-            typeof(Event<>).MakeGenericType(domainType),
-            domainEvent)!;
+            .CreateInstance(typeof(Event<>)
+                .MakeGenericType(domainType),
+                domainEvent)!;
 
         return eventOfDomainEvent;
     }

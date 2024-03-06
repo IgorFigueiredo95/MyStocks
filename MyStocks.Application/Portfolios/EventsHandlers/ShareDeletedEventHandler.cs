@@ -21,6 +21,9 @@ public class ShareDeletedEventHandler : INotificationHandler<Event<ShareDeleted>
     {
         var portfolios = await _portfolioRepository.ContainsShareIdAsync(notification.DomainEvent.ShareId);
 
+        if (portfolios is null)
+            return;
+
         foreach(var portfolio in portfolios)
         {
             portfolio.RemoveShare(notification.DomainEvent.ShareId);
