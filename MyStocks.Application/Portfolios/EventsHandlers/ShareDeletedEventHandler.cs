@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MyStocks.Application.Common;
+using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.SharesAggregate.DomainEvents;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,18 @@ namespace MyStocks.Application.Portfolios.EventsHandlers;
 
 public class ShareDeletedEventHandler : INotificationHandler<Event<ShareDeleted>>
 {
-    public Task Handle(Event<ShareDeleted> notification, CancellationToken cancellationToken)
+    private readonly IPortfolioRepository _portfolioRepository;
+    public ShareDeletedEventHandler(IPortfolioRepository portfolioRepository)
     {
-        throw new NotImplementedException();
+        _portfolioRepository = portfolioRepository;
+    }
+    public async Task Handle(Event<ShareDeleted> notification, CancellationToken cancellationToken)
+    {
+        var portfolios = await _portfolioRepository.ContainsShareIdAsync(notification.DomainEvent.ShareId);
+
+        foreach(var portfolio in portfolios)
+        {
+            portfolio.RemoveShare(notification.DomainEvent.ShareId);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyStocks.Domain.PortfolioAggregate;
+using MyStocks.Domain.SharesAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,5 +48,13 @@ public class PortfolioRepository : IPortfolioRepository
     {
         _context.Portfolios
             .Entry(portfolio).State = EntityState.Modified;
+    }
+
+    public async Task<List<Portfolio>?> ContainsShareIdAsync(ShareId shareId)
+    {
+        return await _context.Portfolios
+            .Where(x => x.ShareIds
+                              .Any(y => y.ShareId == shareId))
+            .ToListAsync();
     }
 }

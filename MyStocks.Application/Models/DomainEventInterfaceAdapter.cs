@@ -26,8 +26,9 @@ public static class INotificatonAdapter
         //retorna o tipo de domain event.
         var domainType = domainEvent.GetType();
 
-        //Cria uma instância do Event<DomainType> que usa a interface Inotification
-        //faz o cast para a mesma interface para retornarmos como resposta ao Inotification
+        //Cria uma instância do Event<DomainType> (cujo já implementa a interface Inotification)
+        //adiciona o domainEvent recebido para a propriedade da classe
+        //faz o cast para a Inotification para retornarmos como resposta ao Inotification
         var eventOfDomainEvent = (INotification)Activator
             .CreateInstance(
             typeof(Event<>).MakeGenericType(domainType),

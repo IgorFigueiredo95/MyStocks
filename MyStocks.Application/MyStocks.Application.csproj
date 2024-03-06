@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Shares\EventsHandlers\**" />
+    <EmbeddedResource Remove="Shares\EventsHandlers\**" />
+    <None Remove="Shares\EventsHandlers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MyStocks.Domain\MyStocks.Domain.csproj" />
   </ItemGroup>
 
@@ -11,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Shares\EventsHandlers\" />
+    <Folder Include="Common\" />
   </ItemGroup>
 
   <PropertyGroup>

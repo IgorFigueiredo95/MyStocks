@@ -22,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
         _mediator = mediator;
     }
+    // Todo: metodo provisório. criar SaveChanges interceptor para publicar notifications
     public async Task DispatchDomainEventsAsync(IReadOnlyCollection<IdomainEvent> domainEvents)
     {
         foreach (var domainEvent in domainEvents)
