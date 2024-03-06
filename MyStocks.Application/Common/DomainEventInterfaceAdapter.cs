@@ -7,8 +7,33 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MyStocks.Application.Common;
-
-public class Event<IDomainEvent> : INotification
+//Classe necessária para realizarmos a conversão do evento de IdomainEvent para Inotification
+//Inotification é uma interface do mediatr e não queremos colocar dependencias a pacotes no nosso domain.
+public class Event<TdomainEvent> : INotification
+    where TdomainEvent : class, IdomainEvent
 {
-//todo: verificar formas de melhorar essa transformação da classe
+    public TdomainEvent DomainEvent { get; }
+
+    public Event(TdomainEvent domainEvent)
+    {
+        DomainEvent = domainEvent;
+    }
 }
+public static class INotificatonAdapter
+{
+    public static INotification TranslateDomainEventToNotification(IdomainEvent domainEvent)
+    {
+        //retorna o tipo de domain event.
+        var domainType = domainEvent.GetType();
+
+        //Cria uma instância do Event<DomainType> que usa a interface Inotification
+        //faz o cast para a mesma interface para retornarmos como resposta ao Inotification
+        var eventOfDomainEvent = (INotification)Activator
+            .CreateInstance(
+            typeof(Event<>).MakeGenericType(domainType),
+            domainEvent)!;
+
+        return eventOfDomainEvent;
+    }
+}
+   

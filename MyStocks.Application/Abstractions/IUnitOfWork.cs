@@ -9,7 +9,7 @@ namespace MyStocks.Application
 {
     public interface IUnitOfWork
     {
-        public void DispatchDomainEvents(IReadOnlyCollection<IdomainEvent> domainEvents);
+        public Task DispatchDomainEventsAsync(IReadOnlyCollection<IdomainEvent> domainEvents);
         public Task CommitAsync();
 
         public Task RollbackAsync();

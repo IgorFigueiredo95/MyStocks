@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Domain.Common.Primitives;
 
-public interface IdomainEvent
+public interface IdomainEvent 
 {
 }

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Portfolios.EventsHandlers;
 
-public class ShareDeletedEventHandler : INotificationHandler<Event<ShareDeletedDomainEvent>>
+public class ShareDeletedEventHandler : INotificationHandler<Event<ShareDeleted>>
 {
-    public Task Handle(Event<ShareDeletedDomainEvent> notification, CancellationToken cancellationToken)
+    public Task Handle(Event<ShareDeleted> notification, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

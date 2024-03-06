@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Domain.SharesAggregate.DomainEvents;
 
-public class ShareDeletedDomainEvent : IdomainEvent
+public class ShareDeleted : IdomainEvent
 {
-    public ShareDeletedDomainEvent()
-    {
-        
-    }
 }
