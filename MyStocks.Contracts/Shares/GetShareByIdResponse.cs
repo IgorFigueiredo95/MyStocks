@@ -15,9 +15,9 @@ public record GetShareByIdResponse(
     string Name,
     string? Description,
     ShareTypes ShareType,
-    Currency TotalValueInvested,
+    decimal TotalValueInvested,
     decimal TotalShares,
-    Currency AveragePrice,
+    decimal AveragePrice,
     List<ShareDetail> SharesDetails,
     DateTime CreatedAt,
     DateTime UpdatedAt);

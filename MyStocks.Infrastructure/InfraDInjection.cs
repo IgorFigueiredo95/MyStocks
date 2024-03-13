@@ -2,11 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyStocks.Application;
+using MyStocks.Application.Shares;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Infrastructure.Currencies;
+using MyStocks.Infrastructure.Persistence.Configurations;
 using MyStocks.Infrastructure.Repositories;
+using MyStocks.Infrastructure.Repositories.Query;
 using System.Configuration;
 
 namespace MyStocks.Infrastructure;
@@ -19,6 +22,7 @@ public static class InfraDInjection
         services.AddScoped<ICurrencyTypesRepository, CurrencyTypesRepository>();
         services.AddScoped<IShareRepository, ShareRepository>();
         services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+        services.AddScoped<IShareQueryRepository,ShareQueryRepository>();
         services.AddDbContext<ApplicationDbContext>();
 
         return services;

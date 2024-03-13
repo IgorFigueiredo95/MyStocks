@@ -98,33 +98,12 @@ public class SharesController : ControllerBase
     {
         var query = new GetShareByIdQuery(id);
         GetShareByIdResponse response;
-        try
-        {
-            var result = await _mediator.Send(query);
-            response = new GetShareByIdResponse(
-                result.Code,
-                result.Name,
-                result.Description,
-                result.ShareType,
-                result.TotalValueInvested,
-                result.TotalShares,
-                result.AveragePrice,
-                result.ShareDetails.ToList(),
-                result.CreatedAt,
-                result.UpdatedAt);
+        var result = await _mediator.Send(query);
+        
+        if(result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
 
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new ProblemDetails()
-            {
-                Title = "One or more errors has ocourred.",
-                Detail = "A validation error error has ocourred. verify you request"
-                //new Dictionary<string, string>().Add("error", $"{ex.Message}")
-            });
-        }
-
-        return Ok(response);
+        return Ok(result.Value);
     }
 
     [HttpPost]

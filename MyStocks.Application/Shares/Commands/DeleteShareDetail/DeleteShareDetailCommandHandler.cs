@@ -35,8 +35,6 @@ public class DeleteShareDetailCommandHandler : IRequestHandler<DeleteShareDetail
         try
         {
             share.RemoveShareDetail(shareDetail);
-            //var shareDeletedEvent = new ShareDeleted(ShareId.Create(share.Id));
-            //share.AddDomainEvent(shareDeletedEvent);
             await _unitOfWork.DispatchDomainEventsAsync(share.RaisedEvents);
             await _unitOfWork.CommitAsync();
         }
