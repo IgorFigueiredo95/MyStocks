@@ -12,4 +12,6 @@ namespace MyStocks.Application.Shares;
 public interface IShareQueryRepository
 {
     public Task<ShareDTO?> GetShareById(Guid id);
+
+    public Task<ShareDetailListDTO?> GetShareDetailListByCode(string Code, int? Limit = 15, int? offset = 0);
 }
