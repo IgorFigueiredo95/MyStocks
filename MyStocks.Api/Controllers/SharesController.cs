@@ -99,10 +99,10 @@ public class SharesController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("{id}")]
-    public async Task<IActionResult> DeleteShare([FromRoute] Guid id)
+    [Route("{code}")]
+    public async Task<IActionResult> DeleteShare(string code)
     {
-        var command = new DeleteShareCommand(id);
+        var command = new DeleteShareCommand(code);
 
         var result = await _mediator.Send(command);
 

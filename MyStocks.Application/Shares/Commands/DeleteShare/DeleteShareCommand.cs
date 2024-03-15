@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Shares.Commands.DeleteShare
 {
-    public record DeleteShareCommand(Guid ShareId):IRequest<Result>;
+    public record DeleteShareCommand(string Code):IRequest<Result>;
 }
