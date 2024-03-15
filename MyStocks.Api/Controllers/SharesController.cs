@@ -27,6 +27,9 @@ public class SharesController : ControllerBase
         _mediator = mediator;
     }
 
+
+    #region Share
+
     [HttpPost]
     public async Task<IActionResult> CreateShare([FromBody] CreateShareRequest request, CancellationToken cancellationToken)
     {
@@ -45,31 +48,106 @@ public class SharesController : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpGet]
+    [Route("{code}")]
+    public async Task<IActionResult> GetShareByCode(string code, CancellationToken cancellationToken)
+    {
+        var query = new GetShareByCodeQuery(code);
+        GetShareByCodeResponse response;
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet]
+    [Route("List")]
+    public async Task<IActionResult> GetShareListListPagination(
+        [FromQuery] int? offSet,
+        [FromQuery] int? limit,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetShareListQuery(limit, offSet);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
+
+        return Ok(result.Value);
+    }
+
     [HttpPut]
-    [Route("{id}")]
-    public async Task<IActionResult> UpdateShare(Guid id, UpdateShareRequest request, CancellationToken cancellationToken)
+    [Route("{code}")]
+    public async Task<IActionResult> UpdateShare(string code, UpdateShareRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateShareCommand(
-            id,
+            code,
             request.Name,
             request.Description,
             request.ShareTypeCode);
 
-        try
-        {
-            await _mediator.Send(command, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new ProblemDetails()
-            {
-                Title = "One or more errors has ocourred.",
-                Detail = ex.Message,
-            });
-        }
+
+           var result =  await _mediator.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext,result.Errors.ToList());
+
+        return Ok("Share updated");
+    }
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> DeleteShare([FromRoute] Guid id)
+    {
+        var command = new DeleteShareCommand(id);
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
 
         return Ok();
+    }
+    #endregion
 
+    #region ShareDetail
+    [HttpPost]
+    [Route("SharesDetail")]
+    public async Task<IActionResult> AddShareDetail([FromBody] CreateShareDetailRequest request, CancellationToken cancellationToken)
+    {
+        var command = new CreateShareDetailCommand(
+            request.ShareCode,
+            request.Note,
+            request.Quantity,
+            request.Price,
+            request.OperationTypeCode);
+
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet]
+    [Route("shareDetails/{shareCode}")]
+    public async Task<IActionResult> GetShareDetaiListPagination(
+        [FromRoute] string shareCode,
+        [FromQuery] int? offSet,
+        [FromQuery] int? limit)
+    {
+        var query = new GetShareDetailListByCodeQuery(shareCode, offSet, limit);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+            return Responses.Error(HttpContext, result.Errors.ToList());
+
+        return Ok(result.Value);
     }
 
     [HttpPut]
@@ -92,56 +170,6 @@ public class SharesController : ControllerBase
 
     }
 
-    [HttpGet]
-    [Route("{id}")]
-    public async Task<IActionResult> GetShareById(Guid id, CancellationToken cancellationToken)
-    {
-        var query = new GetShareByIdQuery(id);
-        GetShareByIdResponse response;
-        var result = await _mediator.Send(query);
-        
-        if(result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
-
-        return Ok(result.Value);
-    }
-
-    [HttpPost]
-    [Route("SharesDetail")]
-    public async Task<IActionResult> AddShareDetail([FromBody] CreateShareDetailRequest request, CancellationToken cancellationToken)
-    {
-        var command = new CreateShareDetailCommand(
-            request.ShareCode,
-            request.Note,
-            request.Quantity,
-            request.Price,
-            request.OperationTypeCode);
-
-
-        var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
-
-        return Ok(result.Value);
-    }
-
-    [HttpGet]
-    [Route("shareDetail/{shareCode}")]
-    public async Task<IActionResult> GetShareDetaiListPagination(
-        [FromRoute] string shareCode,
-        [FromQuery] int offSet,
-        [FromQuery] int limit)
-    {
-        var query = new GetShareDetailListByCodeQuery(shareCode, offSet, limit);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
-
-        return Ok(result.Value);
-    }
-
     [HttpDelete]
     [Route("shareDetail/{id}")]
     public async Task<IActionResult> DeleteShareDetailById([FromRoute] Guid id)
@@ -151,22 +179,10 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext,result.Errors.ToList());
+            return Responses.Error(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
+    #endregion
 
-    [HttpDelete]
-    [Route("{id}")]
-    public async Task<IActionResult> DeleteShare([FromRoute] Guid id)
-    {
-        var command = new DeleteShareCommand(id);
-
-        var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
-
-        return Ok();
-    }
 }
