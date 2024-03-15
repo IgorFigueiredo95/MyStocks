@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MyStocks.Application.Shares;
 using MyStocks.Application.Shares.Queries;
+using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.SharesAggregate;
 using Npgsql;
 using System;
@@ -11,6 +12,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 
 namespace MyStocks.Infrastructure.Repositories.Query;
 
@@ -22,13 +24,11 @@ public class ShareQueryRepository : IShareQueryRepository
         ConnectionString = configuration.GetConnectionString("Default") 
             ?? throw new ArgumentNullException(nameof(configuration));
     }
-    public async Task<ShareDTO?> GetShareById(Guid id)
+    public async Task<ShareDTO?> GetShareByCode(string Code)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            connection.Open();
-            var result =  await connection.QueryAsync<ShareDTO>(
-                $@"SELECT 
+            var query = $@"SELECT 
                     ""Shares"".""Code"" Code,
                     ""Shares"".""Name"" Name,
                     ""Shares"".""Description"" Description,
@@ -38,23 +38,22 @@ public class ShareQueryRepository : IShareQueryRepository
                     ""Shares"".""TotalShares"" TotalShares,
                     ""Shares"".""AveragePrice_Value"" AveragePrice
                   FROM ""Shares""
-                  LEFT JOIN ""ShareDetails"" on ""Shares"".""Id"" = ""ShareDetails"".""ShareId""
                   INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
-                  WHERE ""Shares"".""Id"" = '{id}'");
-            //Todo: inserir o id como parametro da query. evita SQl injection
+                  WHERE ""Shares"".""Code"" = @code";
+            
+            connection.Open();
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { code = Code });
+               
 
-            return result.FirstOrDefault();
+            return queryExecuted.FirstOrDefault();
         }
     }
 
-    public async Task<ShareDetailListDTO?> GetShareDetailListByCode(string Code, int? Limit = 15, int? Offset = 0)
+    public async Task<ShareDetailListDTO?> GetShareDetailListByCode(string Code, int? Limit, int? Offset)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
-            connection.Open();
-
-            var result = await connection.QueryMultipleAsync(
-               $@"select
+            var query = @"select
 	                    ""Shares"".""Code"" Code,
 	                    ""Shares"".""Name"" Name,
 	                    ""Shares"".""Description"" Description,
@@ -68,7 +67,7 @@ public class ShareQueryRepository : IShareQueryRepository
                 left join ""CurrencyTypes"" on
 	                (""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId"")
                 where
-	                ""Shares"".""Code"" = '{Code}';
+	                ""Shares"".""Code"" = @code;
 
                 select
 	                sd.""Id"" ShareDetailId,
@@ -82,17 +81,49 @@ public class ShareQueryRepository : IShareQueryRepository
                 inner join ""Shares"" on
 	                (""Shares"".""Id"" = sd.""ShareId"")
                 where
-	                ""Shares"".""Code"" = '{Code}'
+	                ""Shares"".""Code"" = @code
                 order by
 	                sd.""CreatedAt"" desc
-                limit {Limit}
-	                offset {Offset};",
-                new { ShareCode = Code, QueryLimit = Limit, QueryOffset = Offset });
+                limit @limit
+	            offset @offset;";
 
-            var Share = await result.ReadFirstAsync<ShareDetailListDTO>();
-            Share.SharesDetails = result.ReadAsync<ShareDetailDTO>().Result.ToList();
+            connection.Open();
+            var queryExecuted = connection.QueryMultiple(query, new { code = Code, limit = Limit, offset = Offset });
+          
+            var Share = queryExecuted.ReadFirstOrDefault<ShareDetailListDTO>();
+
+            if (Share is not null)
+                Share.SharesDetails = queryExecuted.Read<ShareDetailDTO>().ToList();
 
             return Share;
+        }
+    }
+
+    public async Task<List<ShareDTO?>> GetSharesList(int? Limit = 15, int? Offset = 0)
+    {
+        using (var connection = new NpgsqlConnection(ConnectionString))
+        {
+            var query =
+            $@"SELECT 
+                    ""Shares"".""Code"" Code,
+                    ""Shares"".""Name"" Name,
+                    ""Shares"".""Description"" Description,
+                    ""Shares"".""ShareType"" ShareType,
+                    ""CurrencyTypes"".""Code"" CurrencyType,
+                    ""Shares"".""TotalValueInvested_Value"" TotalValueInvested,
+                    ""Shares"".""TotalShares"" TotalShares,
+                    ""Shares"".""AveragePrice_Value"" AveragePrice
+                  FROM ""Shares""
+                  INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
+                  limit @limit
+                  offset @offset";
+
+            connection.Open();
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { limit = Limit, offset = Offset });
+
+
+            return queryExecuted.ToList();
+
         }
     }
 }
