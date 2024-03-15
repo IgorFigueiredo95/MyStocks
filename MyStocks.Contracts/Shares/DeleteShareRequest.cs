@@ -6,4 +6,4 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Contracts.Shares;
 
-public record GetShareByIdRequest(Guid Id);
+public record DeleteShareRequest(Guid Shareid);

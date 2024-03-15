@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MyStocks.Domain.Abstractions;
+using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Exceptions;
@@ -25,16 +26,27 @@ public class UpdateShareCommandHandler : IRequestHandler<UpdateShareCommand, Res
 
     public async Task<Result> Handle(UpdateShareCommand request, CancellationToken cancellationToken)
     {
-        var share = await _shareRepository.GetByIdAsync(request.Id);
+        var share = await _shareRepository.GetByCodeAsync(request.Code);
 
         if (share is null) 
-            throw new ValueNotFoundException(nameof(share));
+           return Error.Create("SHARE_NOT_FOUND", $"Share with code '{request.Code}' was not found.");
 
-        share.Update(request.Name, request.Description, Enum.Parse<ShareTypes>(request.shareTypeCode));
+
+        if (request.shareTypeCode is not null &&
+            !Enum.TryParse(typeof(ShareTypes), request.shareTypeCode, out var shareType))
+           return Error.Create("SHARE_TYPE_INVALID", $"Share type '{request.shareTypeCode}' is not valid.");
+
+        var Type = share.ShareType;
+
+        if (request.shareTypeCode is not null)
+            Type = Enum.Parse<ShareTypes>(request.shareTypeCode);
+
+        share.Update(request.Name, request.Description, Type);
 
         _shareRepository.Update(share);
+
         await _unitOfWork.CommitAsync();
 
-        return true;
+        return Result.ReturnSuccess();
     }
 }

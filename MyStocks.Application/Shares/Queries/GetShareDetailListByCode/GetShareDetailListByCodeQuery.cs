@@ -11,6 +11,6 @@ namespace MyStocks.Application.Shares.Queries;
 
 public record GetShareDetailListByCodeQuery(
     string Code,
-    int OffSet,
-    int Limit):IRequest<Result<GetShareDetailListByCodeQueryDTO>>;
+    int? OffSet,
+    int? Limit):IRequest<Result<ShareDetailListDTO>>;
 

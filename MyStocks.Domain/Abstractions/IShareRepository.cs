@@ -24,6 +24,7 @@ public interface IShareRepository
 
     public Task<bool> CodeIsUniqueAsync(string code);
 
+    public Task<Share?> GetShareByShareDetailIdAsync(Guid ShareDetailId);
     public Task<ShareDetail?> GetShareDetailByIdAsync(Guid SharedetailId);
 
     public Task<List<ShareDetail>> GetShareDetailByPagination(Guid ShareId, int Limit, int offSet);

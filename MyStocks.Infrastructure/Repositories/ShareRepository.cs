@@ -4,6 +4,7 @@ using MyStocks.Domain.Shares;
 using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,6 +66,14 @@ public class ShareRepository : IShareRepository
             .FirstOrDefaultAsync(s => s.Id == SharedetailId);
     }
 
+    public async Task<Share?> GetShareByShareDetailIdAsync(Guid ShareDetailId)
+    {
+        return await _context.Shares
+            .Include(i => i.ShareDetails)
+            .Include(i => i.AveragePrice.CurrencyType)
+            .FirstOrDefaultAsync(s => s.ShareDetails.Any(x => x.Id == ShareDetailId));
+
+    }
     public Task<List<ShareDetail>> GetShareDetailByPagination(Guid ShareId, int Limit, int offSet)
     {
         return _context.ShareDetails

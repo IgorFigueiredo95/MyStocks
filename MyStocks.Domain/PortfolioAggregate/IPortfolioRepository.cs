@@ -1,4 +1,5 @@
 ﻿using MyStocks.Domain.Currencies;
+using MyStocks.Domain.SharesAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,7 @@ public interface IPortfolioRepository
     public Task<Portfolio> GetByIdAsync(Guid id);
 
     public Task<List<Portfolio>> GetAllAsync();
+
+    public Task<List<Portfolio>?> ContainsShareIdAsync(ShareId shareId);
 }
 

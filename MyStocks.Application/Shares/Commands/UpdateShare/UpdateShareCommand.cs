@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MyStocks.Application.Shares.Commands;
 
 public record UpdateShareCommand(
-    Guid Id,
+    string Code,
     string? Name,
     string? Description,
     string? shareTypeCode) : IRequest<Result>;
