@@ -1,4 +1,5 @@
 ﻿using MyStocks.Domain.Primitives;
+using MyStocks.Domain.Users.Exceptions;
 using MyStocks.Domain.Users.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,27 @@ public class User: Entity
     public string LastName { get; private set; }
     public Email Email { get; private set; }
     public string Password { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
 
-    private User()
+    private User(string firstName, string lastName, Email email, string password) : base (Guid.NewGuid())
     {
-        
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        Password = password;
+        CreatedAt = DateTime.Now;
     }
 
+    public User Create(string firstName, string lastName, Email email, string password)
+    {
+        if (firstName.Length <= 3 || firstName.Length > Constants.MAX_USERNAME_LENGTH)
+            throw new InvalidFirstNameException(nameof(firstName));
+
+        if (lastName.Length <= 3 || lastName.Length > Constants.MAX_USERLASTNAME_LENGTH)
+            throw new InvalidLastNameException(nameof(lastName));
+
+        //todo: validação para senha. talvez gerar um value object somente para ela.
+       return new  User(firstName, lastName, email, password);
+    }
 }

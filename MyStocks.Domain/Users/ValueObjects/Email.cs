@@ -19,7 +19,7 @@ public class Email : ValueObject
         Address = address;
     }
 
-    public Email Create(string address)
+    public static Email Create(string address)
     {
         if (Validate(address))
             throw new ArgumentException($"The string '{address}' is an invalid email.");
