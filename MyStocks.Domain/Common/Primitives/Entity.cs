@@ -18,11 +18,11 @@ public abstract class Entity
     public Entity(Guid id)
     {
        Id = id;
+        _RaisedEvents = new List<IdomainEvent>();
     }
 
     public void AddDomainEvent(IdomainEvent domainEvent)
     {
-        _RaisedEvents = _RaisedEvents ?? new List<IdomainEvent>();
         _RaisedEvents.Add(domainEvent);
     }
 
