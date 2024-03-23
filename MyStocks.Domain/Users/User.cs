@@ -1,4 +1,5 @@
-﻿using MyStocks.Domain.Primitives;
+﻿using MyStocks.Domain.Common.Primitives;
+using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Users.Exceptions;
 using MyStocks.Domain.Users.ValueObjects;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Domain.Users;
 
-public class User: Entity
+public class User: Entity , IAggregateRoot
 {
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
@@ -27,7 +28,7 @@ public class User: Entity
         CreatedAt = DateTime.Now;
     }
 
-    public User Create(string firstName, string lastName, Email email, string password)
+    public static User Create(string firstName, string lastName, Email email, string password)
     {
         if (firstName.Length <= 3 || firstName.Length > Constants.MAX_USERNAME_LENGTH)
             throw new InvalidFirstNameException(nameof(firstName));

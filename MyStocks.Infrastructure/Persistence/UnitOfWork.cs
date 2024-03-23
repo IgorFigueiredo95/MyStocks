@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
     // Todo: metodo provisório. criar SaveChanges interceptor para publicar notifications
     public async Task DispatchDomainEventsAsync(IReadOnlyCollection<IdomainEvent> domainEvents)
     {
+
         foreach (var domainEvent in domainEvents)
         {
             

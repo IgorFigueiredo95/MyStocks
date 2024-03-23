@@ -5,6 +5,7 @@ using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.Shares;
 using MyStocks.Domain.SharesAggregate;
+using MyStocks.Domain.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace MyStocks.Infrastructure
         public DbSet<Share> Shares { get; set; }
         public DbSet<ShareDetail> ShareDetails { get; set; }
         public DbSet<Portfolio> Portfolios { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

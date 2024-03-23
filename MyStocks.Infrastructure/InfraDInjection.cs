@@ -6,6 +6,7 @@ using MyStocks.Application.Shares;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
+using MyStocks.Domain.Users;
 using MyStocks.Infrastructure.Currencies;
 using MyStocks.Infrastructure.Persistence.Configurations;
 using MyStocks.Infrastructure.Repositories;
@@ -23,6 +24,7 @@ public static class InfraDInjection
         services.AddScoped<IShareRepository, ShareRepository>();
         services.AddScoped<IPortfolioRepository, PortfolioRepository>();
         services.AddScoped<IShareQueryRepository,ShareQueryRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddDbContext<ApplicationDbContext>();
 
         return services;

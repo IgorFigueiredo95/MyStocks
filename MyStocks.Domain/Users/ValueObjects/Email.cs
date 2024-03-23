@@ -14,25 +14,32 @@ public class Email : ValueObject
 
     public bool IsValid { get; private set; }
 
-    private Email(string address)
+    private Email(string address, bool? isValidated)
     {
         Address = address;
+        IsValid = isValidated ?? false;
     }
 
     public static Email Create(string address)
     {
-        if (Validate(address))
+        if (!TryCreate(address, out var email))
             throw new ArgumentException($"The string '{address}' is an invalid email.");
-
-        Email email = new Email(address);
-        email.IsValid = true;
 
         return email;
     }
 
-    public static bool Validate(string address)
+    public static bool TryCreate(string address, out Email? Email)
     {
-       return  MailAddress.TryCreate(address, out var mailAddress);
+       var canCreate = MailAddress.TryCreate(address, out var mailAddress);
+
+        if (canCreate)
+        {
+            Email = new Email(address,true);
+            return true;
+        }
+
+        Email = null;
+        return false;
     }
 
     public override List<object> GetAtomicValues()
