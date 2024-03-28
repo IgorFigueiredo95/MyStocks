@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyStocks.Domain.Users;
 
 namespace MyStocks.Infrastructure.Persistence.Configurations;
 
@@ -54,5 +55,11 @@ public class PortfolioModelBuilder : IEntityTypeConfiguration<Portfolio>
                         destDate => DateTime.SpecifyKind(destDate, DateTimeKind.Utc),
                         srcDate => DateTime.SpecifyKind(srcDate, DateTimeKind.Utc));
             });
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(x => x.OwnerId);
+
+        //builder.Property(c => c.OwnerId);
     }
 }

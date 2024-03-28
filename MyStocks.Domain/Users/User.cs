@@ -30,10 +30,10 @@ public class User: Entity , IAggregateRoot
 
     public static User Create(string firstName, string lastName, Email email, string password)
     {
-        if (firstName.Length <= 3 || firstName.Length > Constants.MAX_USERNAME_LENGTH)
+        if (firstName.Length <= 3 || firstName.Length > UserConstants.MAX_USERNAME_LENGTH)
             throw new InvalidFirstNameException(nameof(firstName));
 
-        if (lastName.Length <= 3 || lastName.Length > Constants.MAX_USERLASTNAME_LENGTH)
+        if (lastName.Length <= 3 || lastName.Length > UserConstants.MAX_USERLASTNAME_LENGTH)
             throw new InvalidLastNameException(nameof(lastName));
 
         //todo: validação para senha. talvez gerar um value object somente para ela.

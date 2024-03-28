@@ -24,6 +24,8 @@ public class Portfolio : Entity, IAggregateRoot
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
+    public Guid OwnerId { get; private set; }
+
 
 
     public Portfolio() : base(Guid.NewGuid()) { }

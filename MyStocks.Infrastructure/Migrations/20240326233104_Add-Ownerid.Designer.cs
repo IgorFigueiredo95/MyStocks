@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyStocks.Infrastructure;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyStocks.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240326233104_Add-Ownerid")]
+    partial class AddOwnerid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,8 +60,6 @@ namespace MyStocks.Infrastructure.Migrations
                     b.HasIndex("CurrencyCode")
                         .IsUnique();
 
-                    b.HasIndex("OwnerId");
-
                     b.ToTable("CurrencyTypes");
                 });
 
@@ -90,8 +91,6 @@ namespace MyStocks.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("Portfolios");
                 });
@@ -135,8 +134,6 @@ namespace MyStocks.Infrastructure.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("Shares");
                 });
@@ -207,23 +204,8 @@ namespace MyStocks.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MyStocks.Domain.Currencies.CurrencyTypes", b =>
-                {
-                    b.HasOne("MyStocks.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MyStocks.Domain.PortfolioAggregate.Portfolio", b =>
                 {
-                    b.HasOne("MyStocks.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsMany("MyStocks.Domain.PortfolioAggregate.ValueObjects.AssociatedShares", "ShareIds", b1 =>
                         {
                             b1.Property<Guid>("PortfolioId")
@@ -248,12 +230,6 @@ namespace MyStocks.Infrastructure.Migrations
 
             modelBuilder.Entity("MyStocks.Domain.SharesAggregate.Share", b =>
                 {
-                    b.HasOne("MyStocks.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("MyStocks.Domain.Currencies.Currency", "AveragePrice", b1 =>
                         {
                             b1.Property<Guid>("ShareId")

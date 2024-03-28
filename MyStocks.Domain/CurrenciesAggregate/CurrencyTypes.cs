@@ -8,6 +8,7 @@ public class CurrencyTypes : Entity
     public string CurrencyCode { get; private set; }
     public string Name { get; private set; }
     public bool IsDefault { get; private set; } = false;
+    public Guid OwnerId { get; private set; }
 
 
     private CurrencyTypes(Guid id, string code, string currencyCode, string name)

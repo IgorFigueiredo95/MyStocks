@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Domain.Users;
 
-public static partial class Constants
+public static partial class UserConstants
 {
     public const int MAX_USERNAME_LENGTH = 20;
     public const int MAX_USERLASTNAME_LENGTH = 20;

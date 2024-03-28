@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using MyStocks.Api.Common;
@@ -16,6 +17,8 @@ public class UserController:ControllerBase
     {
         this._mediator = mediator;
     }
+
+    [AllowAnonymous]
     [HttpPost]
     [Route("v1")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken cancellation)

@@ -1,6 +1,9 @@
+using MyStocks.Api.Authentication;
 using MyStocks.Api.Middlewares;
 using MyStocks.Application;
+using MyStocks.Application.Abstractions;
 using MyStocks.Infrastructure;
+using MyStocks.Infrastructure.Authentication;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddAuthenticationConfig();
 
 var app = builder.Build();
 
@@ -25,8 +29,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 //app.UseMiddleware<GlobalHandleException>();
 app.Run();

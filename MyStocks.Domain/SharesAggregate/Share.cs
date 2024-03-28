@@ -34,6 +34,7 @@ public class Share : Entity, IAggregateRoot
     public Currency TotalValueInvested { get; private set; }
     public decimal TotalShares { get; private set; }
     public Currency AveragePrice { get; private set; }
+    public Guid OwnerId { get; private set; }
 
     private List<ShareDetail> _shareDetails = new List<ShareDetail>();
     public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }

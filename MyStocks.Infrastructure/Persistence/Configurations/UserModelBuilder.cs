@@ -20,11 +20,11 @@ public class UserModelBuilder : IEntityTypeConfiguration<User>
             .ValueGeneratedNever();
 
         builder.Property(x => x.FirstName)
-            .HasMaxLength(Constants.MAX_USERNAME_LENGTH)
+            .HasMaxLength(UserConstants.MAX_USERNAME_LENGTH)
             .IsRequired();
 
         builder.Property(x => x.LastName)
-            .HasMaxLength(Constants.MAX_USERLASTNAME_LENGTH)
+            .HasMaxLength(UserConstants.MAX_USERLASTNAME_LENGTH)
             .IsRequired();
 
         builder.Property(x => x.Email)

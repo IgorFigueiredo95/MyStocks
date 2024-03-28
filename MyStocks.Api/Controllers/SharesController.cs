@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Currencies;
@@ -48,7 +49,7 @@ public class SharesController : ControllerBase
 
         return Ok(result.Value);
     }
-
+    [Authorize]
     [HttpGet]
     [Route("{code}")]
     public async Task<IActionResult> GetShareByCode(string code, CancellationToken cancellationToken)
