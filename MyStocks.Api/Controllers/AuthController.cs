@@ -25,6 +25,7 @@ public class AuthController : ControllerBase
     [Route("v1/login")]
     public async Task<IActionResult> UserLogin([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
+        throw new NotImplementedException();
         var command = new LoginCommand(request.Email, request.password);
 
         var commandResult = await _mediator.Send(command);
