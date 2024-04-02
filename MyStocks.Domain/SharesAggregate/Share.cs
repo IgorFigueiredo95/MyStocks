@@ -1,4 +1,5 @@
-﻿using MyStocks.Domain.Common.Primitives;
+﻿using MyStocks.Domain.Common.Abstractions;
+using MyStocks.Domain.Common.Primitives;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Exceptions;
@@ -7,6 +8,7 @@ using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Shares.Exceptions;
 using MyStocks.Domain.Shares.Exceptions.Shares;
 using MyStocks.Domain.Shares.Exceptions.SharesDetail;
+using MyStocks.Domain.SharesAggregate.DomainEvents;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +27,7 @@ namespace MyStocks.Domain.SharesAggregate;
 //Agregates filhos "ShareDetail" são controlados/persistidos por aqui. para garantir a consistência.
 //https://martinfowler.com/bliki/DDD_Aggregate.html
 //https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
-public class Share : Entity, IAggregateRoot
+public class Share : Entity, IAggregateRoot, IHasOwner
 {
     public string Code { get; private set; }
     public string Name { get; private set; }
@@ -38,6 +40,7 @@ public class Share : Entity, IAggregateRoot
     private List<ShareDetail> _shareDetails = new List<ShareDetail>();
     public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
 
+    public Guid OwnerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
     
@@ -72,7 +75,11 @@ public class Share : Entity, IAggregateRoot
         if (currencyType is null)
             throw new CurrencyTypeCannotBeEmptyShareException(nameof(currencyType), new ArgumentNullException(nameof(currencyType)));
 
-        return new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
+        Share share = new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
+
+        share.AddDomainEvent(new ShareCreated(share.Id));
+
+        return share;
     }
 
     public Share Update(string? name, string? description, ShareTypes? shareTypes)

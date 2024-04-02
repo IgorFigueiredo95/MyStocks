@@ -33,11 +33,11 @@ namespace MyStocks.Application.Shares.Commands
 
         public async Task<Result<Guid>> Handle(CreateShareCommand request, CancellationToken cancellationToken)
         {
+            
             var resultValidation = _validator.Validate(request);
 
             if (!resultValidation.IsValid)
                 return resultValidation.ReturnListErrors();
-
             var exist = await _shareRepository.CodeIsUniqueAsync(request.code);
             if (!exist)
                 return Error.Create("SHARE_CODE_CONFLICT", $"Code '{request.code}' is already in use.");

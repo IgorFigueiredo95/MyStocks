@@ -24,7 +24,7 @@ public class ShareQueryRepository : IShareQueryRepository
         ConnectionString = configuration.GetConnectionString("Default") 
             ?? throw new ArgumentNullException(nameof(configuration));
     }
-    public async Task<ShareDTO?> GetShareByCode(string Code)
+    public async Task<ShareDTO?> GetShareByCode(Guid OwnerId, string Code)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -39,17 +39,18 @@ public class ShareQueryRepository : IShareQueryRepository
                     ""Shares"".""AveragePrice_Value"" AveragePrice
                   FROM ""Shares""
                   INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
-                  WHERE ""Shares"".""Code"" = @code";
+                  WHERE ""Shares"".""Code"" = @code AND
+                        ""Shares"".""OwnerId"" = @ownerId";
             
             connection.Open();
-            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { code = Code });
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { ownerId = OwnerId, code = Code });
                
 
             return queryExecuted.FirstOrDefault();
         }
     }
 
-    public async Task<ShareDetailListDTO?> GetShareDetailListByCode(string Code, int? Limit, int? Offset)
+    public async Task<ShareDetailListDTO?> GetShareDetailListByCode(Guid OwnerId, string Code, int? Limit, int? Offset)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -67,7 +68,8 @@ public class ShareQueryRepository : IShareQueryRepository
                 left join ""CurrencyTypes"" on
 	                (""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId"")
                 where
-	                ""Shares"".""Code"" = @code;
+	                ""Shares"".""Code"" = @code AND
+                    ""Shares"".""OwnerId"" = @ownerId;
 
                 select
 	                sd.""Id"" ShareDetailId,
@@ -81,14 +83,15 @@ public class ShareQueryRepository : IShareQueryRepository
                 inner join ""Shares"" on
 	                (""Shares"".""Id"" = sd.""ShareId"")
                 where
-	                ""Shares"".""Code"" = @code
+	                ""Shares"".""Code"" = @code AND
+                    ""Shares"".""OwnerId"" = @ownerId
                 order by
 	                sd.""CreatedAt"" desc
                 limit @limit
 	            offset @offset;";
 
             connection.Open();
-            var queryExecuted = connection.QueryMultiple(query, new { code = Code, limit = Limit, offset = Offset });
+            var queryExecuted = connection.QueryMultiple(query, new { ownerId = OwnerId, code = Code, limit = Limit, offset = Offset });
           
             var Share = queryExecuted.ReadFirstOrDefault<ShareDetailListDTO>();
 
@@ -99,7 +102,7 @@ public class ShareQueryRepository : IShareQueryRepository
         }
     }
 
-    public async Task<List<ShareDTO?>> GetSharesList(int? Limit = 15, int? Offset = 0)
+    public async Task<List<ShareDTO?>> GetSharesList(Guid OwnerId, int? Limit = 15, int? Offset = 0)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -115,12 +118,12 @@ public class ShareQueryRepository : IShareQueryRepository
                     ""Shares"".""AveragePrice_Value"" AveragePrice
                   FROM ""Shares""
                   INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
+                  WHERE ""Shares"".""OwnerId"" = @ownerId
                   limit @limit
                   offset @offset";
 
             connection.Open();
-            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { limit = Limit, offset = Offset });
-
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { ownerId = OwnerId, limit = Limit, offset = Offset });
 
             return queryExecuted.ToList();
 

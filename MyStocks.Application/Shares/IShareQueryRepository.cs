@@ -11,11 +11,11 @@ namespace MyStocks.Application.Shares;
 
 public interface IShareQueryRepository
 {
-    public Task<ShareDTO?> GetShareByCode(string code);
+    public Task<ShareDTO?> GetShareByCode(Guid OwnerId, string code);
 
-    public Task<List<ShareDTO?>> GetSharesList(int? Limit = 15, int? offset = 0);
+    public Task<List<ShareDTO?>> GetSharesList(Guid OwnerId, int? Limit = 15, int? offset = 0);
 
-    public Task<ShareDetailListDTO?> GetShareDetailListByCode(string Code, int? Limit = 15, int? offset = 0);
+    public Task<ShareDetailListDTO?> GetShareDetailListByCode(Guid OwnerId, string Code, int? Limit = 15, int? offset = 0);
 
     
 }

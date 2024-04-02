@@ -24,16 +24,17 @@ public class DeleteShareCommandHandler : IRequestHandler<DeleteShareCommand, Res
 
     public async Task<Result> Handle(DeleteShareCommand request, CancellationToken cancellationToken)
     {
-        var share = await _shareRepository.GetByIdAsync(request.ShareId);
+        var share = await _shareRepository.GetByCodeAsync(request.Code);
 
         if (share is null)
-            return Error.Create("SHARE_NOT_FOUND", $"a share with an id '{request.ShareId}' was not found.");
+            return Error.Create("SHARE_NOT_FOUND", $"Share with code '{request.Code}' was not found.");
 
         _shareRepository.Remove(share);
-        var shareDeletedEvent = new ShareDeleted(ShareId.Create(request.ShareId));
+        var shareDeletedEvent = new ShareDeleted(ShareId.Create(share.Id));
+
+        //todo: esse domain event pode ser passado para dentro dop aggregate root
         share.AddDomainEvent(shareDeletedEvent);
 
-        await _unitOfWork.DispatchDomainEventsAsync(share.RaisedEvents);
         await _unitOfWork.CommitAsync();
 
         return Result.ReturnSuccess();

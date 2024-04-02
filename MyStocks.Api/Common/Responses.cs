@@ -23,7 +23,7 @@ public class Responses: ProblemDetails
         _Errors.AddRange(error);
         Instance = context.Request.Path;
     }
-    public static ObjectResult Error(HttpContext context, Error error)
+    public static ObjectResult ErrorResponse(HttpContext context, Error error)
     {
         var errorList = new List<Error>() { error };
         var res = new Responses(errorList, context);
@@ -31,7 +31,7 @@ public class Responses: ProblemDetails
         return new ObjectResult(res);
     }
 
-    public static ObjectResult Error(HttpContext context, List<Error> error)
+    public static ObjectResult ErrorResponse(HttpContext context, List<Error> error)
     {
         var res = new Responses(error, context);
         return new ObjectResult(res);

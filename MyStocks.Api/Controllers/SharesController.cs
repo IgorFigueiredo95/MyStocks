@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Currencies;
@@ -15,7 +17,7 @@ using MyStocks.Domain.Shares;
 using System.Threading;
 
 namespace MyStocks.Api.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("[Controller]")]
 public class SharesController : ControllerBase
@@ -26,7 +28,6 @@ public class SharesController : ControllerBase
     {
         _mediator = mediator;
     }
-
 
     #region Share
 
@@ -43,7 +44,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
 
         return Ok(result.Value);
@@ -58,7 +59,8 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
+
 
         return Ok(result.Value);
     }
@@ -74,7 +76,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -93,21 +95,21 @@ public class SharesController : ControllerBase
            var result =  await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext,result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext,result.Errors.ToList());
 
         return Ok("Share updated");
     }
 
     [HttpDelete]
-    [Route("{id}")]
-    public async Task<IActionResult> DeleteShare([FromRoute] Guid id)
+    [Route("{code}")]
+    public async Task<IActionResult> DeleteShare(string code)
     {
-        var command = new DeleteShareCommand(id);
+        var command = new DeleteShareCommand(code);
 
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok();
     }
@@ -129,7 +131,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -145,7 +147,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -164,7 +166,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok();
 
@@ -179,7 +181,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }

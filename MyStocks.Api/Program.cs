@@ -1,18 +1,22 @@
+using MyStocks.Api;
 using MyStocks.Api.Middlewares;
 using MyStocks.Application;
+using MyStocks.Application.Abstractions;
 using MyStocks.Infrastructure;
+using MyStocks.Infrastructure.Authentication;
 using System.Configuration;
+using System.Security.Principal;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddPresentation();
 
 var app = builder.Build();
 
@@ -24,9 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<GlobalHandleException>();
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-//app.UseMiddleware<GlobalHandleException>();
 app.Run();

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyStocks.Domain.Users;
 
 namespace MyStocks.Application.Currencies
 {
@@ -29,6 +30,11 @@ namespace MyStocks.Application.Currencies
 
             builder.Property(c => c.IsDefault).IsRequired();
 
+            builder.Property(c => c.OwnerId).IsRequired();
+
+            builder.HasOne<User>()
+                .WithMany().
+                HasForeignKey(c => c.OwnerId);
         }
     }
 }

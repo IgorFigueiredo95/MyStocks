@@ -5,6 +5,7 @@ using MyStocks.Domain;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Shares;
 using MyStocks.Domain.SharesAggregate;
+using MyStocks.Domain.Users;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

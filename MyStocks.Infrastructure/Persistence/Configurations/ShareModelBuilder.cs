@@ -4,9 +4,11 @@ using MyStocks.Domain;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Shares;
 using MyStocks.Domain.SharesAggregate;
+using MyStocks.Domain.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -58,6 +60,9 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
                 DstDate => DateTime.SpecifyKind(DstDate, DateTimeKind.Utc)
                 );
 
+            builder.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(x => x.OwnerId);
         }
     }
 }

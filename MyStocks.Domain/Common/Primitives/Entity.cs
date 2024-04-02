@@ -10,19 +10,18 @@ namespace MyStocks.Domain.Primitives;
 
 public abstract class Entity
 {
-    private List<IdomainEvent> _RaisedEvents;
+    private List<IdomainEvent> _RaisedEvents = new List<IdomainEvent>();
     public IReadOnlyCollection<IdomainEvent> RaisedEvents { get => _RaisedEvents; }
 
     public Guid Id { get; private set; }
-
     public Entity(Guid id)
     {
        Id = id;
+        _RaisedEvents = new List<IdomainEvent>();
     }
 
     public void AddDomainEvent(IdomainEvent domainEvent)
     {
-        _RaisedEvents = _RaisedEvents ?? new List<IdomainEvent>();
         _RaisedEvents.Add(domainEvent);
     }
 
