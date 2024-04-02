@@ -29,7 +29,12 @@ public class UserRepository : IUserRepository
     }
     public async Task<User?> GetUserByIdAsync(Guid Id)
     {
-        return _context.Users.FirstOrDefault(x => x.Id == Id);
+        return await _context.Users.FirstOrDefaultAsync(x => x.Id == Id);
+    }
+
+    public async Task<User?> GetUserByEmailAsync(Email Email)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Email == Email);
     }
 
     public void UpdateUser(User User)
