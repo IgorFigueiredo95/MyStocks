@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Currencies;
@@ -12,6 +13,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyStocks.Api
 {
+    [Authorize]
     [ApiController]
     [Route("[Controller]/currencyTypes")]
     public class CurrencyController : ControllerBase
@@ -34,7 +36,7 @@ namespace MyStocks.Api
             var resultValue = await _mediator.Send(command);
 
             if (resultValue.IsFailure)
-                return Responses.Error(HttpContext, resultValue.Errors.ToList());
+                return Responses.ErrorResponse(HttpContext, resultValue.Errors.ToList());
 
             return Ok(resultValue);
         }
@@ -47,7 +49,7 @@ namespace MyStocks.Api
             var resultValue = await _mediator.Send(command);
 
             if (resultValue.IsFailure)
-                return Responses.Error(HttpContext, resultValue.Errors.ToList());
+                return Responses.ErrorResponse(HttpContext, resultValue.Errors.ToList());
 
             return Ok(resultValue);
         }
@@ -60,7 +62,7 @@ namespace MyStocks.Api
                var  resultValue = await _mediator.Send(query);
 
             if (resultValue.IsFailure)
-                return Responses.Error(HttpContext, resultValue.Errors.ToList());
+                return Responses.ErrorResponse(HttpContext, resultValue.Errors.ToList());
 
             return Ok(resultValue);
 

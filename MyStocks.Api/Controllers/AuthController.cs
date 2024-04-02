@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
         var commandResult = await _mediator.Send(command);
 
         if (commandResult.IsFailure)
-            return Responses.Error(HttpContext,commandResult.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, commandResult.Errors.ToList());
 
         //todo: receber valores referente ao token da app layer 
         var response = new LoginResponse(commandResult.Value,DateTime.Now,DateTime.Now.AddHours(_jwtConfig.ExpiresInHours));

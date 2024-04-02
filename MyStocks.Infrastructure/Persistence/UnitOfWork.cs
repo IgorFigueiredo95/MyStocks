@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Principal;
 using System.Text;
@@ -64,6 +65,7 @@ public class UnitOfWork : IUnitOfWork
 
     private async Task DispatchDomainEventsAsync(ApplicationDbContext context)
     {
+
         var entitiesWithDomainEvent = context.ChangeTracker
             .Entries<Entity>()
             .Where(x => x.Entity.RaisedEvents.Any());
