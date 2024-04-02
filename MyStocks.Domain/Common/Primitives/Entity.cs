@@ -14,7 +14,6 @@ public abstract class Entity
     public IReadOnlyCollection<IdomainEvent> RaisedEvents { get => _RaisedEvents; }
 
     public Guid Id { get; private set; }
-
     public Entity(Guid id)
     {
        Id = id;

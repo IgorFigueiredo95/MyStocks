@@ -35,8 +35,6 @@ namespace MyStocks.Application.Currencies
             builder.HasOne<User>()
                 .WithMany().
                 HasForeignKey(c => c.OwnerId);
-
-            //builder.Property(c => c.OwnerId);
         }
     }
 }

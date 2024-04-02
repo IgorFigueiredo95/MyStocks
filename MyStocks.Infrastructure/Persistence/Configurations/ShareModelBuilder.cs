@@ -8,6 +8,7 @@ using MyStocks.Domain.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,7 +63,6 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.HasOne<User>()
                 .WithMany()
                 .HasForeignKey(x => x.OwnerId);
-            //builder.Property(c => c.OwnerId);
         }
     }
 }

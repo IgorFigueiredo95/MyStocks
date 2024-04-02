@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.XPath;
@@ -20,13 +21,16 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
 {
     private readonly IShareQueryRepository _shareQueryRepository;
     private readonly IValidator<GetShareDetailListByCodeQuery> _validator;
+    private readonly IPrincipal _principal;
 
     public GetShareDetailListByCodeQueryHandler(
         IShareQueryRepository shareQueryRepository,
-        IValidator<GetShareDetailListByCodeQuery> validator)
+        IValidator<GetShareDetailListByCodeQuery> validator,
+        IPrincipal principal)
     {
         _shareQueryRepository = shareQueryRepository;
         _validator = validator;
+        _principal = principal;
     }
     public async Task<Result<ShareDetailListDTO>> Handle(GetShareDetailListByCodeQuery request, CancellationToken cancellationToken)
     {
@@ -35,7 +39,7 @@ public class GetShareDetailListByCodeQueryHandler : IRequestHandler<GetShareDeta
         if (!resultValidation.IsValid)
             return resultValidation.ReturnListErrors();
 
-        var resultValue = await _shareQueryRepository.GetShareDetailListByCode(request.Code,request.Limit,request.OffSet);
+        var resultValue = await _shareQueryRepository.GetShareDetailListByCode(Guid.Parse(_principal.Identity.Name), request.Code,request.Limit,request.OffSet);
 
         if (resultValue is null)
             return Error.Create("SHARE_NOT_FOUND", $"Share with code '{request.Code}' was not found.");

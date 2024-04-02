@@ -24,10 +24,15 @@ namespace MyStocks.Infrastructure
         public DbSet<Portfolio> Portfolios { get; set; }
         public DbSet<User> Users { get; set; }
 
+        private readonly IConfiguration _configuration;
+        public ApplicationDbContext(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
-            optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=Mystocks_db;User Id=dev-user;Password=dev-run;");
+            optionsBuilder.UseNpgsql(_configuration.GetConnectionString("Default"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,8 +1,9 @@
-﻿using MyStocks.Domain.Exceptions;
+﻿using MyStocks.Domain.Common.Abstractions;
+using MyStocks.Domain.Exceptions;
 using MyStocks.Domain.Primitives;
 namespace MyStocks.Domain.Currencies;
 
-public class CurrencyTypes : Entity
+public class CurrencyTypes : Entity, IHasOwner
 {
     public string Code { get; private set; }
     public string CurrencyCode { get; private set; }

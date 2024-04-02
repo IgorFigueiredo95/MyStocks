@@ -10,7 +10,7 @@ namespace MyStocks.Api.Controllers;
 
 [ApiController]
 [Route("[Controller]")]
-public class UserController:ControllerBase
+public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
     public UserController(IMediator mediator)
@@ -30,6 +30,6 @@ public class UserController:ControllerBase
         if(result.IsFailure)
             return Responses.Error(HttpContext,result.Errors.ToList());
 
-        return Ok(result.Value);
+        return Ok(result);
     }
 }

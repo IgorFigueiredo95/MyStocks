@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
@@ -16,7 +17,7 @@ using MyStocks.Domain.Shares;
 using System.Threading;
 
 namespace MyStocks.Api.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("[Controller]")]
 public class SharesController : ControllerBase
@@ -27,7 +28,6 @@ public class SharesController : ControllerBase
     {
         _mediator = mediator;
     }
-
 
     #region Share
 
@@ -49,7 +49,7 @@ public class SharesController : ControllerBase
 
         return Ok(result.Value);
     }
-    [Authorize]
+
     [HttpGet]
     [Route("{code}")]
     public async Task<IActionResult> GetShareByCode(string code, CancellationToken cancellationToken)
@@ -60,6 +60,7 @@ public class SharesController : ControllerBase
 
         if (result.IsFailure)
             return Responses.Error(HttpContext, result.Errors.ToList());
+
 
         return Ok(result.Value);
     }

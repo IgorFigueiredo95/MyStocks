@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyStocks.Application.Models
+namespace MyStocks.Domain.Common.Abstractions;
+
+public interface IHasOwner
 {
-    internal class JWTManager
-    {
-    }
+    public Guid OwnerId { get; }
 }

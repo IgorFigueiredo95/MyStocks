@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MyStocks.Application;
 using MyStocks.Application.Abstractions;
 using MyStocks.Application.Shares;
@@ -30,10 +31,21 @@ public static class InfraDInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddDbContext<ApplicationDbContext>();
         services.AddTransient<IJWTProvider, JWTProvider>();
+        services.AddSingleton<IJWTConfig>(provider => provider.GetRequiredService<IOptions<JWTConfig>>().Value);
+        services.AddOptions<JWTConfig>()
+            .BindConfiguration(nameof(JWTConfig))
+            .Validate(JWTConfig =>
+            {
+                if (JWTConfig.Issuer == string.Empty)
+                    return false;
+                if(JWTConfig.Audience == string.Empty)
+                    return false;
+                if (JWTConfig.ExpiresInHours <= 0)
+                    return false;
 
-        var jWTConfig = new JWTConfig();
-        configuration.Bind(nameof(JWTConfig), jWTConfig);
-        services.AddSingleton<IJWTConfig>(jWTConfig);
+                return true;
+            })
+            .ValidateOnStart();
 
         return services;
     }

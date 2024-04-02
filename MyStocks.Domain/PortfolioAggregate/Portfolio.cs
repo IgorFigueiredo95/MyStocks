@@ -10,10 +10,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using MyStocks.Domain.Common.Abstractions;
 
 namespace MyStocks.Domain.PortfolioAggregate;
 
-public class Portfolio : Entity, IAggregateRoot
+public class Portfolio : Entity, IAggregateRoot, IHasOwner
 {
     public string Name { get; private set; }
     public string? Description { get; private set; }
@@ -21,10 +22,10 @@ public class Portfolio : Entity, IAggregateRoot
     private readonly List<AssociatedShares> _ShareIds = new List<AssociatedShares>();
     public IReadOnlyCollection<AssociatedShares> ShareIds { get => _ShareIds; }
     public int SharesCount { get; private set; } = 0;
-    public DateTime CreatedAt { get; private set; }
-    public DateTime? UpdatedAt { get; private set; }
 
     public Guid OwnerId { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? UpdatedAt { get; private set; }
 
 
 

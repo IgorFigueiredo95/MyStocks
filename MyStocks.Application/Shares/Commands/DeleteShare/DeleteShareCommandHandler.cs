@@ -35,7 +35,6 @@ public class DeleteShareCommandHandler : IRequestHandler<DeleteShareCommand, Res
         //todo: esse domain event pode ser passado para dentro dop aggregate root
         share.AddDomainEvent(shareDeletedEvent);
 
-        await _unitOfWork.DispatchDomainEventsAsync(share.RaisedEvents);
         await _unitOfWork.CommitAsync();
 
         return Result.ReturnSuccess();

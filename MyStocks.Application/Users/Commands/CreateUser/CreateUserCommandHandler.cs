@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MyStocks.Application.Abstractions;
 using MyStocks.Domain.Common;
 using MyStocks.Domain.Common.ResultObject;
 using MyStocks.Domain.Users;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Users.Commands;
 
-public class CreateUserCommandhandler : IRequestHandler<CreateUserCommand, Result<User>>
+public class CreateUserCommandhandler : IRequestHandler<CreateUserCommand, Result>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -20,7 +21,7 @@ public class CreateUserCommandhandler : IRequestHandler<CreateUserCommand, Resul
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
     }
-    public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         Email.TryCreate(request.Email, out var userEmail);
 
@@ -37,16 +38,13 @@ public class CreateUserCommandhandler : IRequestHandler<CreateUserCommand, Resul
         {
              user = User.Create(request.FirstName, request.LastName, userEmail, request.Password);
             _userRepository.CreateUser(user);
-            await _unitOfWork.DispatchDomainEventsAsync(user.RaisedEvents);
             await _unitOfWork.CommitAsync();
-
         }
         catch (Exception ex)
         {
-
             return Error.Create("INVALID_OPERATION", ex.Message);
         }
 
-        return user;
+        return Result.ReturnSuccess();
     }
 }

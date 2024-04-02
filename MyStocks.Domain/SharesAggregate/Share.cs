@@ -1,4 +1,5 @@
-﻿using MyStocks.Domain.Common.Primitives;
+﻿using MyStocks.Domain.Common.Abstractions;
+using MyStocks.Domain.Common.Primitives;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.Enums;
 using MyStocks.Domain.Exceptions;
@@ -25,7 +26,7 @@ namespace MyStocks.Domain.SharesAggregate;
 //Agregates filhos "ShareDetail" são controlados/persistidos por aqui. para garantir a consistência.
 //https://martinfowler.com/bliki/DDD_Aggregate.html
 //https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
-public class Share : Entity, IAggregateRoot
+public class Share : Entity, IAggregateRoot, IHasOwner
 {
     public string Code { get; private set; }
     public string Name { get; private set; }
@@ -34,11 +35,11 @@ public class Share : Entity, IAggregateRoot
     public Currency TotalValueInvested { get; private set; }
     public decimal TotalShares { get; private set; }
     public Currency AveragePrice { get; private set; }
-    public Guid OwnerId { get; private set; }
 
     private List<ShareDetail> _shareDetails = new List<ShareDetail>();
     public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
 
+    public Guid OwnerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
     

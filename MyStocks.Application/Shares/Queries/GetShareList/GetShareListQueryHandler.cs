@@ -9,6 +9,7 @@ using MyStocks.Domain.SharesAggregate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,15 +18,17 @@ namespace MyStocks.Application.Shares.Queries;
 public class GetShareListQueryHandler : IRequestHandler<GetShareListQuery, Result<List<ShareDTO>>>
 {
     private readonly IShareQueryRepository _shareQueryRepository;
+    private readonly IPrincipal _principal;
 
-    public GetShareListQueryHandler(IShareQueryRepository shareQueryRepository)
+    public GetShareListQueryHandler(IShareQueryRepository shareQueryRepository, IPrincipal principal)
     {
         _shareQueryRepository = shareQueryRepository;
+        _principal = principal;
     }
 
     public async Task<Result<List<ShareDTO>>> Handle(GetShareListQuery request, CancellationToken cancellationToken)
     {
-        var sharesDto = await _shareQueryRepository.GetSharesList(request.limit, request.offSet);
+        var sharesDto = await _shareQueryRepository.GetSharesList(Guid.Parse(_principal.Identity.Name), request.limit, request.offSet);
 
         if (!sharesDto.Any())
             return sharesDto;

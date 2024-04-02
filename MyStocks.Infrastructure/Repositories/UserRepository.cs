@@ -27,7 +27,6 @@ public class UserRepository : IUserRepository
         if (user is not null)
             _context.Users.Remove(user);
     }
-
     public async Task<User?> GetUserByIdAsync(Guid Id)
     {
         return _context.Users.FirstOrDefault(x => x.Id == Id);
@@ -35,7 +34,7 @@ public class UserRepository : IUserRepository
 
     public void UpdateUser(User User)
     {
-        _context.Entry(User).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        _context.Entry(User).State = EntityState.Modified;
     }
 
     public async Task<bool> EmailIsUniqueAsync(Email Email)

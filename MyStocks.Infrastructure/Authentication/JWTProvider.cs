@@ -23,8 +23,7 @@ public class JWTProvider : IJWTProvider
     }
     public string GenerateToken(User user)
     {
-        var key = _jwtConfig.Key;
-        var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+        var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtConfig.Key));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -44,7 +43,8 @@ public class JWTProvider : IJWTProvider
     private ClaimsIdentity GenerateClaims(User user)
     {
         var claims = new ClaimsIdentity();
-        claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+        //claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+        claims.AddClaim(new Claim(ClaimTypes.Name, user.Id.ToString()));
 
         return claims;
     }
