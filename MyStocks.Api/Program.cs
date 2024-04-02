@@ -28,8 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<GlobalHandleException>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-//app.UseMiddleware<GlobalHandleException>();
 app.Run();

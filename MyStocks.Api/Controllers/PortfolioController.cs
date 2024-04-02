@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Portfolios.Commands;
@@ -8,7 +9,7 @@ using MyStocks.Contracts;
 using MyStocks.Contracts.Portfolio;
 
 namespace MyStocks.Api.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("[Controller]")]
 public class PortfolioController : ControllerBase
@@ -27,7 +28,7 @@ public class PortfolioController : ControllerBase
         var commandResult = await _mediator.Send(command);
 
         if (commandResult.IsFailure)
-            return Responses.Error(HttpContext, commandResult.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, commandResult.Errors.ToList());
 
         return Ok(commandResult.Value);
     }
@@ -41,7 +42,7 @@ public class PortfolioController : ControllerBase
         var commandResult = await _mediator.Send(command);
 
         if(commandResult.IsFailure)
-            return Responses.Error(HttpContext,commandResult.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext,commandResult.Errors.ToList());
 
         return Ok();
     }
@@ -55,7 +56,7 @@ public class PortfolioController : ControllerBase
         var commandResult = await _mediator.Send(command);
 
         if (commandResult.IsFailure)
-            return Responses.Error(HttpContext, commandResult.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, commandResult.Errors.ToList());
 
         return Ok();
     }

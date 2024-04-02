@@ -1,16 +1,37 @@
-﻿namespace MyStocks.Api.Middlewares;
+﻿using MyStocks.Api.Common;
+using MyStocks.Domain.Common;
 
-public class GlobalHandleException : IMiddleware
+namespace MyStocks.Api.Middlewares;
+
+public class GlobalHandleException
 {
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    private readonly RequestDelegate _next;
+
+    public GlobalHandleException(RequestDelegate next)
     {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+
         try
         {
-            await next(context);
+            await _next(context);
         }
         catch (Exception ex)
         {
-            await context.Response.WriteAsync("I cought you on my middleware!");
-        }
+            ProblemDetailException(context, ex);
+        } 
+
+    }
+
+    private HttpContext ProblemDetailException(HttpContext context, Exception exception)
+    {
+            context.Response.StatusCode = 500;
+            context.Response.WriteAsJsonAsync(
+            Responses.ErrorResponse(context, Error.Create("UNHANDLED_ERROR", exception.Message)).Value);
+
+        return context;
     }
 }

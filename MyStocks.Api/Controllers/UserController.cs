@@ -28,7 +28,7 @@ public class UserController : ControllerBase
         var result = await _mediator.Send(command);
 
         if(result.IsFailure)
-            return Responses.Error(HttpContext,result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext,result.Errors.ToList());
 
         return Ok(result);
     }

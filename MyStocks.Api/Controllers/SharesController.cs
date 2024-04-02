@@ -44,7 +44,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
 
         return Ok(result.Value);
@@ -59,7 +59,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
 
         return Ok(result.Value);
@@ -76,7 +76,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -95,7 +95,7 @@ public class SharesController : ControllerBase
            var result =  await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext,result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext,result.Errors.ToList());
 
         return Ok("Share updated");
     }
@@ -109,7 +109,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok();
     }
@@ -131,7 +131,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -147,7 +147,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
@@ -166,7 +166,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok();
 
@@ -181,7 +181,7 @@ public class SharesController : ControllerBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return Responses.Error(HttpContext, result.Errors.ToList());
+            return Responses.ErrorResponse(HttpContext, result.Errors.ToList());
 
         return Ok(result.Value);
     }
