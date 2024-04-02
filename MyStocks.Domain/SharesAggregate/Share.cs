@@ -8,6 +8,7 @@ using MyStocks.Domain.Primitives;
 using MyStocks.Domain.Shares.Exceptions;
 using MyStocks.Domain.Shares.Exceptions.Shares;
 using MyStocks.Domain.Shares.Exceptions.SharesDetail;
+using MyStocks.Domain.SharesAggregate.DomainEvents;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -74,7 +75,11 @@ public class Share : Entity, IAggregateRoot, IHasOwner
         if (currencyType is null)
             throw new CurrencyTypeCannotBeEmptyShareException(nameof(currencyType), new ArgumentNullException(nameof(currencyType)));
 
-        return new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
+        Share share = new Share(Guid.NewGuid(), code, name, description, shareType, currencyType);
+
+        share.AddDomainEvent(new ShareCreated(share.Id));
+
+        return share;
     }
 
     public Share Update(string? name, string? description, ShareTypes? shareTypes)

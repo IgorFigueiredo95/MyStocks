@@ -5,11 +5,13 @@ using MyStocks.Application.CurrenciesTypes.Queries;
 using MyStocks.Domain.Common.Abstractions;
 using MyStocks.Domain.Common.Primitives;
 using MyStocks.Domain.Primitives;
+using MyStocks.Domain.SharesAggregate;
 using MyStocks.Domain.Users;
 using MyStocks.Infrastructure.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Principal;
@@ -62,13 +64,14 @@ public class UnitOfWork : IUnitOfWork
 
     private async Task DispatchDomainEventsAsync(ApplicationDbContext context)
     {
-        var entitiesWithDomainEvent = context.ChangeTracker.Entries<Entity>()
-            .Where(entitiesEntry => entitiesEntry
-                .Property(x => x.RaisedEvents).CurrentValue.Count >= 1);
+        var entitiesWithDomainEvent = context.ChangeTracker
+            .Entries<Entity>()
+            .Where(x => x.Entity.RaisedEvents.Any());
 
-        foreach (var entity in entitiesWithDomainEvent)
+        foreach(var entity in entitiesWithDomainEvent)
         {
-            var domainEvents = entity.Property(x => x.RaisedEvents).CurrentValue;
+            var domainEvents = entity.Entity.RaisedEvents;
+
             foreach (var domainEvent in domainEvents)
             {
 
