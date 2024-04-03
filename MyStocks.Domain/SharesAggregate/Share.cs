@@ -158,6 +158,12 @@ public class Share : Entity, IAggregateRoot, IHasOwner
         }
         else
         {
+            if(TotalShares - shareDetail.Quantity == 0)
+            {
+                AveragePrice = Currency.Create(AveragePrice.CurrencyType, 0);
+                return;
+            }
+
             decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
                                              (TotalShares - shareDetail.Quantity);
 
