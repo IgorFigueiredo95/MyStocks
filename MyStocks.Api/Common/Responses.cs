@@ -4,6 +4,7 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using static System.Net.WebRequestMethods;
 
 namespace MyStocks.Api.Common;
 
@@ -21,6 +22,7 @@ public class Responses: ProblemDetails
         Status = 400;
         Detail = error.Count() > 1? "One or more errors has ocourred.": "An error has occurred.";
         _Errors.AddRange(error);
+        Type = $"https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/{Status}";
         Instance = context.Request.Path;
     }
     public static ObjectResult ErrorResponse(HttpContext context, Error error)
