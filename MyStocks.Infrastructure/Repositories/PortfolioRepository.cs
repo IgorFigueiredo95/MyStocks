@@ -28,12 +28,12 @@ public class PortfolioRepository : IPortfolioRepository
         return await _context.Portfolios.ToListAsync();
     }
 
-    public async Task<Portfolio> GetByIdAsync(Guid id)
+    public async Task<Portfolio?> GetByIdAsync(Guid id)
     {
         return await _context.Portfolios
             .Where(x => x.Id == id)
             .Include(x=>x.ShareIds)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
     }
 
     public void Remove(Guid id)
