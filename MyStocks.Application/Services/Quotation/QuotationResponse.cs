@@ -37,5 +37,5 @@ public record QuotationData(
     decimal? fiftyTwoWeekHighChangePercent,
     decimal? fiftyTwoWeekLow,
     decimal? fiftyTwoWeekHigh,
-    string symbol
+    string? symbol
    );
