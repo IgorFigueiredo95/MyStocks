@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ public class QuotationService : IQuotationService
 {
     private readonly HttpClient _httpClient;
 
-    private const string Quotation = "/quote";
+    private string Quotation = "api/quote";
 
     public QuotationService(HttpClient httpClient)
     {
@@ -21,8 +22,8 @@ public class QuotationService : IQuotationService
 
     public async Task<decimal> GetQuotationValue(string Sharecode)
     {
-       var response = await _httpClient.GetFromJsonAsync<QuotationData>($"{Quotation}/{Sharecode}");
+        var response = await _httpClient.GetFromJsonAsync<QuotationResponse>($"{Quotation}/{Sharecode}");
 
-        return response.regularMarketPrice.Value;
+        return response.results.FirstOrDefault().regularMarketPrice.Value;
     }
 }
