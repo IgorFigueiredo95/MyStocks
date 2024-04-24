@@ -60,15 +60,14 @@ public static class InfraDInjection
             .ValidateOnStart();
 
         //adicionando API de cotação. 3 formas basicas de fazer https://www.youtube.com/watch?v=g-JGay_lnWI
-        services.AddHttpClient<IQuotationService>((serviceProvider, httpclient) =>
+        services.AddHttpClient<IQuotationService,QuotationService>((serviceProvider, httpclient) =>
         {
             var quotationConfig = serviceProvider.GetRequiredService<IOptions<QuotationConfig>>().Value;
 
             httpclient.BaseAddress = new Uri(quotationConfig.BaseAddress.ToString());
             httpclient.DefaultRequestHeaders.Add("Authorization", "Bearer " + quotationConfig.Token);
+            httpclient.DefaultRequestHeaders.Add("Accept", "application/json; charset=utf-8");
         });
-
-        services.AddTransient<IQuotationService, QuotationService>();
         #endregion
 
         return services;
