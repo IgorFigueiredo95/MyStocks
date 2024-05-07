@@ -8,5 +8,5 @@ namespace MyStocks.Application.Services.Quotation;
 
 public interface IQuotationService
 {
-    public Task<decimal> GetQuotationValue(string Sharecode);
+    public Task<decimal> GetQuotationDataAsync(string Sharecode);
 }

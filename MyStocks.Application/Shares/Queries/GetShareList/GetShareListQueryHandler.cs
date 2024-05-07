@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Shares.Queries;
 
-public class GetShareListQueryHandler : IRequestHandler<GetShareListQuery, Result<List<ShareDTO>>>
+public class GetShareListQueryHandler : IRequestHandler<GetShareListQuery, Result<List<ShareResponse>>>
 {
     private readonly IShareQueryRepository _shareQueryRepository;
     private readonly IPrincipal _principal;
@@ -26,7 +26,7 @@ public class GetShareListQueryHandler : IRequestHandler<GetShareListQuery, Resul
         _principal = principal;
     }
 
-    public async Task<Result<List<ShareDTO>>> Handle(GetShareListQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<ShareResponse>>> Handle(GetShareListQuery request, CancellationToken cancellationToken)
     {
         var sharesDto = await _shareQueryRepository.GetSharesList(Guid.Parse(_principal.Identity.Name), request.limit, request.offSet);
 

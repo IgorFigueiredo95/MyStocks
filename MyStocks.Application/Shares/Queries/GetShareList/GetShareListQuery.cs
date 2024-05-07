@@ -11,4 +11,4 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Queries;
 
-public record GetShareListQuery(int? limit, int? offSet):IRequest<Result<List<ShareDTO>>>;
+public record GetShareListQuery(int? limit, int? offSet):IRequest<Result<List<ShareResponse>>>;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyStocks.Api.Common;
 using MyStocks.Application.Abstractions;
 using MyStocks.Application.Authentication;
+using MyStocks.Application.Services.Quotation;
 using MyStocks.Contracts.Authentication;
 
 namespace MyStocks.Api.Controllers;
@@ -14,10 +15,12 @@ public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IJWTConfig _jwtConfig;
-    public AuthController(IMediator mediator, IJWTConfig jwtConfig)
+    private readonly IQuotationService _quotationService;
+    public AuthController(IMediator mediator, IJWTConfig jwtConfig, IQuotationService quotationService)
     {
         _mediator = mediator;
         _jwtConfig = jwtConfig;
+        _quotationService = quotationService;
     }
 
     [AllowAnonymous]
@@ -25,6 +28,7 @@ public class AuthController : ControllerBase
     [Route("v1/login")]
     public async Task<IActionResult> UserLogin([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
+
         var command = new LoginCommand(request.Email, request.password);
 
         var commandResult = await _mediator.Send(command);
@@ -33,9 +37,9 @@ public class AuthController : ControllerBase
             return Responses.ErrorResponse(HttpContext, commandResult.Errors.ToList());
 
         //todo: receber valores referente ao token da app layer 
-        var response = new LoginResponse(commandResult.Value,DateTime.Now,DateTime.Now.AddHours(_jwtConfig.ExpiresInHours));
-        
-        return Ok(response);     
+        var response = new LoginResponse(commandResult.Value, DateTime.Now, DateTime.Now.AddHours(_jwtConfig.ExpiresInHours));
+
+        return Ok(response);
     }
 
 }

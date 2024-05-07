@@ -20,10 +20,9 @@ public class QuotationService : IQuotationService
         _httpClient = httpClient;
     }
 
-    public async Task<decimal> GetQuotationValue(string Sharecode)
+    public async Task<decimal> GetQuotationDataAsync(string Sharecode)
     {
         var response = await _httpClient.GetFromJsonAsync<QuotationResponse>($"{Quotation}/{Sharecode}");
-
         return response.results.FirstOrDefault().regularMarketPrice.Value;
     }
 }
