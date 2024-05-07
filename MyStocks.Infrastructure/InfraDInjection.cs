@@ -33,7 +33,7 @@ public static class InfraDInjection
         services.AddScoped<IShareQueryRepository,ShareQueryRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddDbContext<ApplicationDbContext>();
-        services.AddTransient<IJWTProvider, JWTProvider>();
+        services.AddTransient<IJWTService, JWTProvider>();
         services.AddSingleton<IJWTConfig>(provider => provider.GetRequiredService<IOptions<JWTConfig>>().Value);
         services.AddOptions<JWTConfig>()
             .BindConfiguration(nameof(JWTConfig))
@@ -60,14 +60,7 @@ public static class InfraDInjection
             .ValidateOnStart();
 
         //adicionando API de cotação. 3 formas basicas de fazer https://www.youtube.com/watch?v=g-JGay_lnWI
-        services.AddHttpClient<IQuotationService,QuotationService>((serviceProvider, httpclient) =>
-        {
-            var quotationConfig = serviceProvider.GetRequiredService<IOptions<QuotationConfig>>().Value;
-
-            httpclient.BaseAddress = new Uri(quotationConfig.BaseAddress.ToString());
-            httpclient.DefaultRequestHeaders.Add("Authorization", "Bearer " + quotationConfig.Token);
-            httpclient.DefaultRequestHeaders.Add("Accept", "application/json; charset=utf-8");
-        });
+        services.AddHttpClient<IQuotationProvider, QuotationProvider>();
         #endregion
 
         return services;

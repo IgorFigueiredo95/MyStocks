@@ -7,6 +7,7 @@ using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.Shares;
 using MyStocks.Domain.SharesAggregate;
+using MyStocks.Domain.SharesAggregate.ValueObjects;
 using MyStocks.Domain.Users;
 using System;
 using System.Collections.Generic;
@@ -45,8 +46,11 @@ namespace MyStocks.Infrastructure
             if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 var identity = _contextAccessor.HttpContext.User.Identity.Name;
-                modelBuilder.Entity<IHasOwner>().HasQueryFilter(x => x.OwnerId == Guid.Parse(identity));
+                modelBuilder.Entity<CurrencyTypes>().HasQueryFilter(x => x.OwnerId == Guid.Parse(identity));
+                modelBuilder.Entity<Share>().HasQueryFilter(x => x.OwnerId == Guid.Parse(identity));
+                modelBuilder.Entity<Portfolio>().HasQueryFilter(x => x.OwnerId == Guid.Parse(identity));
             }
+
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             //var Identity = Thread.CurrentPrincipal.Identity.Name;

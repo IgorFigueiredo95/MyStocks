@@ -5,6 +5,7 @@ using MyStocks.Application.CurrenciesTypes;
 using MyStocks.Application.CurrenciesTypes.Queries;
 using MyStocks.Application.CurrenciesTypes.Validations;
 using MyStocks.Application.Portfolios.Commands;
+using MyStocks.Application.Services.Quotation;
 using MyStocks.Application.Shares.Commands;
 using MyStocks.Application.Shares.Queries;
 using MyStocks.Application.Shares.Validations;
@@ -24,6 +25,7 @@ public static class AppDInjection
         services.AddScoped<IValidator<CreateShareCommand>, CreateShareCommandValidation>();
         services.AddScoped<IValidator<GetShareDetailListByCodeQuery>, GetShareDetailListByCodeQueryValidation>();
         services.AddScoped<IValidator<CreatePortfolioCommand>, CreatePortfolioCommandValidation>();
+        services.AddScoped<IQuotationService, QuotationService>();
         return services;
     }
 }

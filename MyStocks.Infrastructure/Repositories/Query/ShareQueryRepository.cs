@@ -36,7 +36,9 @@ public class ShareQueryRepository : IShareQueryRepository
                     ""CurrencyTypes"".""Code"" CurrencyType,
                     ""Shares"".""TotalValueInvested_Value"" TotalValueInvested,
                     ""Shares"".""TotalShares"" TotalShares,
-                    ""Shares"".""AveragePrice_Value"" AveragePrice
+                    ""Shares"".""AveragePrice_Value"" AveragePrice,
+                    ""Shares"".""CreatedAt"" CreatedAt,
+                    ""Shares"".""UpdatedAt"" UpdatedAt
                   FROM ""Shares""
                   INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
                   WHERE ""Shares"".""Code"" = @code AND
@@ -115,7 +117,9 @@ public class ShareQueryRepository : IShareQueryRepository
                     ""CurrencyTypes"".""Code"" CurrencyType,
                     ""Shares"".""TotalValueInvested_Value"" TotalValueInvested,
                     ""Shares"".""TotalShares"" TotalShares,
-                    ""Shares"".""AveragePrice_Value"" AveragePrice
+                    ""Shares"".""AveragePrice_Value"" AveragePrice,
+                    ""Shares"".""CreatedAt"" CreatedAt,
+                    ""Shares"".""UpdatedAt"" UpdatedAt
                   FROM ""Shares""
                   INNER JOIN ""CurrencyTypes"" on ""CurrencyTypes"".""Id"" = ""Shares"".""TotalValueInvested_CurrencyTypeId""
                   WHERE ""Shares"".""OwnerId"" = @ownerId

@@ -9,6 +9,5 @@ namespace MyStocks.Application.Services.Quotation;
 public class QuotationConfig
 {
     public string Token { get; set; }
-
     public string BaseAddress { get; set; }
 }

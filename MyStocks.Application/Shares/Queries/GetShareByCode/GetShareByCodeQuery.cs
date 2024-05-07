@@ -11,4 +11,4 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Queries;
 
-public record GetShareByCodeQuery(string Code):IRequest<Result<ShareDTO>>;
+public record GetShareByCodeQuery(string Code):IRequest<Result<ShareResult>>;

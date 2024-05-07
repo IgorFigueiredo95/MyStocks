@@ -15,9 +15,9 @@ namespace MyStocks.Application.Authentication;
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IJWTProvider _jwtProvider;
+    private readonly IJWTService _jwtProvider;
 
-    public LoginCommandHandler(IUserRepository userRepository, IJWTProvider jwtProvider)
+    public LoginCommandHandler(IUserRepository userRepository, IJWTService jwtProvider)
     {
         _userRepository = userRepository;
         _jwtProvider = jwtProvider;
