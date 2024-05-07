@@ -59,5 +59,8 @@ public class PortfolioModelBuilder : IEntityTypeConfiguration<Portfolio>
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(x => x.OwnerId);
+
+        //var Identity = Thread.CurrentPrincipal.Identity.Name;
+        //builder.HasQueryFilter(x => x.OwnerId == Guid.Parse(Identity));
     }
 }

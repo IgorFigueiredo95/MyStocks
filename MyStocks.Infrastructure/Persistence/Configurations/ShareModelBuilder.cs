@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,6 +64,11 @@ namespace MyStocks.Infrastructure.Persistence.Configurations
             builder.HasOne<User>()
                 .WithMany()
                 .HasForeignKey(x => x.OwnerId);
+
+
+            //var Identity = Thread.CurrentPrincipal.Identity.Name;
+            //builder.HasQueryFilter(x => x.OwnerId == Guid.Parse(Identity));
+
         }
     }
 }

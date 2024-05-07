@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using MyStocks.Domain.Common.Abstractions;
 using MyStocks.Domain.Currencies;
 using MyStocks.Domain.PortfolioAggregate;
 using MyStocks.Domain.Shares;
@@ -25,9 +27,12 @@ namespace MyStocks.Infrastructure
         public DbSet<User> Users { get; set; }
 
         private readonly IConfiguration _configuration;
-        public ApplicationDbContext(IConfiguration configuration)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public ApplicationDbContext(IConfiguration configuration,
+            IHttpContextAccessor contextAccessor)
         {
             _configuration = configuration;
+            _contextAccessor = contextAccessor;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -37,7 +42,15 @@ namespace MyStocks.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                var identity = _contextAccessor.HttpContext.User.Identity.Name;
+                modelBuilder.Entity<IHasOwner>().HasQueryFilter(x => x.OwnerId == Guid.Parse(identity));
+            }
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            //var Identity = Thread.CurrentPrincipal.Identity.Name;
+            //builder.HasQueryFilter(x => x.OwnerId == Guid.Parse(Identity));
         }
     }
 }
