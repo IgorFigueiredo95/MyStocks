@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Infrastructure.Authentication;
 
-public class JWTProvider : IJWTProvider
+public class JWTProvider : IJWTService
 {
     private readonly IJWTConfig _jwtConfig;
     public JWTProvider(IJWTConfig jwtConfig)

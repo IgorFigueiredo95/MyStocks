@@ -28,7 +28,7 @@ namespace MyStocks.Domain.SharesAggregate;
 //https://martinfowler.com/bliki/DDD_Aggregate.html
 //https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model
 public class Share : Entity, IAggregateRoot, IHasOwner
-{
+{ 
     public string Code { get; private set; }
     public string Name { get; private set; }
     public string? Description { get; private set; }
@@ -39,7 +39,6 @@ public class Share : Entity, IAggregateRoot, IHasOwner
 
     private List<ShareDetail> _shareDetails = new List<ShareDetail>();
     public IReadOnlyCollection<ShareDetail> ShareDetails { get => _shareDetails; }
-
     public Guid OwnerId { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -159,6 +158,12 @@ public class Share : Entity, IAggregateRoot, IHasOwner
         }
         else
         {
+            if(TotalShares - shareDetail.Quantity == 0)
+            {
+                AveragePrice = Currency.Create(AveragePrice.CurrencyType, 0);
+                return;
+            }
+
             decimal price = (TotalShares * AveragePrice.Value - shareDetail.Price.Value * shareDetail.Quantity) /
                                              (TotalShares - shareDetail.Quantity);
 

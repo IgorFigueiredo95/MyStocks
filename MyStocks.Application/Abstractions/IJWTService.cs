@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyStocks.Application.Abstractions;
 
-public interface IJWTProvider
+public interface IJWTService
 {
     public string GenerateToken(User user);
 }

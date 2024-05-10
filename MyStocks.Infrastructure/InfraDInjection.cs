@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using MyStocks.Application;
 using MyStocks.Application.Abstractions;
+using MyStocks.Application.Services.Quotation;
 using MyStocks.Application.Shares;
 using MyStocks.Domain.Abstractions;
 using MyStocks.Domain.Currencies;
@@ -14,6 +16,7 @@ using MyStocks.Infrastructure.Currencies;
 using MyStocks.Infrastructure.Persistence.Configurations;
 using MyStocks.Infrastructure.Repositories;
 using MyStocks.Infrastructure.Repositories.Query;
+using MyStocks.Infrastructure.Services.Quotation;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 
@@ -30,7 +33,7 @@ public static class InfraDInjection
         services.AddScoped<IShareQueryRepository,ShareQueryRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddDbContext<ApplicationDbContext>();
-        services.AddTransient<IJWTProvider, JWTProvider>();
+        services.AddTransient<IJWTService, JWTProvider>();
         services.AddSingleton<IJWTConfig>(provider => provider.GetRequiredService<IOptions<JWTConfig>>().Value);
         services.AddOptions<JWTConfig>()
             .BindConfiguration(nameof(JWTConfig))
@@ -46,6 +49,19 @@ public static class InfraDInjection
                 return true;
             })
             .ValidateOnStart();
+
+        #region QuotationAPI
+        services.AddOptions<QuotationConfig>()
+            .BindConfiguration(nameof(QuotationConfig))
+            .Validate(quotationConfig =>
+            {
+                return !quotationConfig.Token.IsNullOrEmpty();
+            })
+            .ValidateOnStart();
+
+        //adicionando API de cotação. 3 formas basicas de fazer https://www.youtube.com/watch?v=g-JGay_lnWI
+        services.AddHttpClient<IQuotationProvider, QuotationProvider>();
+        #endregion
 
         return services;
     }

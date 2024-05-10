@@ -15,7 +15,7 @@ public interface IPortfolioRepository
     public void Update(Portfolio portfolio);
 
     public void Remove(Guid id);
-    public Task<Portfolio> GetByIdAsync(Guid id);
+    public Task<Portfolio?> GetByIdAsync(Guid id);
 
     public Task<List<Portfolio>> GetAllAsync();
 

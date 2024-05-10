@@ -35,6 +35,9 @@ namespace MyStocks.Application.Currencies
             builder.HasOne<User>()
                 .WithMany().
                 HasForeignKey(c => c.OwnerId);
+
+            //var Identity = Thread.CurrentPrincipal.Identity.Name;
+            //builder.HasQueryFilter(x => x.OwnerId == Guid.Parse(Identity));
         }
     }
 }
