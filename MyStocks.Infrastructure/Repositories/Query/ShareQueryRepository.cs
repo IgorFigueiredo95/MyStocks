@@ -24,7 +24,7 @@ public class ShareQueryRepository : IShareQueryRepository
         ConnectionString = configuration.GetConnectionString("Default") 
             ?? throw new ArgumentNullException(nameof(configuration));
     }
-    public async Task<ShareResponse?> GetShareByCode(Guid OwnerId, string Code)
+    public async Task<ShareDTO?> GetShareByCode(Guid OwnerId, string Code)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -45,7 +45,7 @@ public class ShareQueryRepository : IShareQueryRepository
                         ""Shares"".""OwnerId"" = @ownerId";
             
             connection.Open();
-            var queryExecuted = await connection.QueryAsync<ShareResponse>(query, new { ownerId = OwnerId, code = Code });
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { ownerId = OwnerId, code = Code });
                
 
             return queryExecuted.FirstOrDefault();
@@ -104,7 +104,7 @@ public class ShareQueryRepository : IShareQueryRepository
         }
     }
 
-    public async Task<List<ShareResponse?>> GetSharesList(Guid OwnerId, int? Limit = 15, int? Offset = 0)
+    public async Task<List<ShareDTO?>> GetSharesList(Guid OwnerId, int? Limit = 15, int? Offset = 0)
     {
         using (var connection = new NpgsqlConnection(ConnectionString))
         {
@@ -127,7 +127,7 @@ public class ShareQueryRepository : IShareQueryRepository
                   offset @offset";
 
             connection.Open();
-            var queryExecuted = await connection.QueryAsync<ShareResponse>(query, new { ownerId = OwnerId, limit = Limit, offset = Offset });
+            var queryExecuted = await connection.QueryAsync<ShareDTO>(query, new { ownerId = OwnerId, limit = Limit, offset = Offset });
 
             return queryExecuted.ToList();
 
